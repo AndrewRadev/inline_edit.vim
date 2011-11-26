@@ -26,12 +26,12 @@ function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype) dict
   call append(0, lines)
   normal! Gdd
   set nomodified
-  let &filetype = self.filetype
-
+  set foldlevel=99
   let self.proxy_buffer = bufnr('%')
-  let b:proxy_buffer    = self
 
-  autocmd BufWrite <buffer> silent call b:proxy_buffer.UpdateOriginalBuffer()
+  call s:SetupBuffer(self)
+
+  autocmd BufWrite <buffer> silent call b:proxy.UpdateOriginalBuffer()
 endfunction
 
 function! inline_edit#proxy_buffer#UpdateOriginalBuffer() dict
@@ -48,4 +48,16 @@ function! inline_edit#proxy_buffer#UpdateOriginalBuffer() dict
   exe 'buffer ' . self.proxy_buffer
 
   let self.end = self.start + len(new_lines) - 1
+  call s:SetupBuffer(self)
+endfunction
+
+function! s:SetupBuffer(proxy)
+  let b:proxy   = a:proxy
+  let &filetype = b:proxy.filetype
+
+  let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
+  if &statusline =~ '%[fF]'
+    let statusline = substitute(&statusline, '%[fF]', statusline, '')
+  endif
+  exe "setlocal statusline=" . escape(statusline, ' |')
 endfunction
