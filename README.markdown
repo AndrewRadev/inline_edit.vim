@@ -1,4 +1,13 @@
-Editing javascript within HTML is annoying. Solution:
+*(Note: Still early in development, but should be usable.)*
+
+## Problem
+
+Editing javascript within HTML is annoying. To generalize, editing code that's
+embedded in some different code is annoying.
+
+## Solution
+
+Given the following example:
 
 ``` html
 <script type="text/javascript">
@@ -14,26 +23,34 @@ Execute `:InlineEdit` within the script tag. A proxy buffer is opened with
 *only* the javascript. Saving the proxy buffer updates the original one. You
 can reindent, lint, slice and dice as much as you like.
 
-Same thing for sql within ruby:
+## What does it work for?
 
-``` ruby
-def some_heavy_query
-  execute <<-SQL
-    select * from users where something = 'other';
-  SQL
-end
-```
+- Javascript within HTML
+- SQL within ruby (matches "<<-SQL")
 
-Same thing for code within markdown blocks.
+  ``` ruby
+  def some_heavy_query
+    execute <<-SQL
+      SELECT * FROM users WHERE something = 'other';
+    SQL
+  end
+  ```
+
+- Ruby code within markdown blocks
 
 <pre>
-Some text.
+  Some text.
 
-``` ruby
-def foo
-  puts "OK"
-end
-```
+  ``` ruby
+  def foo
+    puts "OK"
+  end
+  ```
 
-Some other text.
+  Some other text
 </pre>
+
+## Known issues
+
+- The indentation is adjusted correctly only when spaces are used (soft tabs)
+- The cursor is not positioned quite right in the new buffer after saving
