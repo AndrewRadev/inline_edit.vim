@@ -5,6 +5,7 @@ function! inline_edit#proxy_buffer#New()
         \ 'filetype':        '',
         \ 'start':           -1,
         \ 'end':             -1,
+        \ 'indent':          -1,
         \
         \ 'Init':                 function('inline_edit#proxy_buffer#Init'),
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy_buffer#UpdateOriginalBuffer'),
@@ -13,16 +14,19 @@ function! inline_edit#proxy_buffer#New()
   return proxy_buffer
 endfunction
 
-function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype) dict
+function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype, indent) dict
   let self.original_buffer = bufnr('%')
   let self.start           = a:start_line
   let self.end             = a:end_line
   let self.filetype        = a:filetype
+  let self.indent          = a:indent
 
-  let lines     = getbufline('%', self.start, self.end)
-  let temp_file = tempname()
+  let lines = []
+  for line in getbufline('%', self.start, self.end)
+    call add(lines, substitute(line, '^\s\{'.self.indent.'}', '', ''))
+  endfor
 
-  exe 'split ' . temp_file
+  exe 'split ' . tempname()
   call append(0, lines)
   normal! Gdd
   set nomodified
@@ -34,8 +38,14 @@ function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype) dict
   autocmd BufWrite <buffer> silent call b:proxy.UpdateOriginalBuffer()
 endfunction
 
+" TODO (2011-11-26) Handle noexpandtab
 function! inline_edit#proxy_buffer#UpdateOriginalBuffer() dict
-  let new_lines = getbufline('%', 0, '$')
+  let leading_whitespace = repeat(' ', self.indent)
+
+  let new_lines = []
+  for line in getbufline('%', 0, '$')
+    call add(new_lines, leading_whitespace.line)
+  endfor
 
   " Switch to the original buffer, delete the relevant lines, add the new
   " ones, switch back to the diff buffer.

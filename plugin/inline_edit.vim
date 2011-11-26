@@ -27,12 +27,13 @@ function! s:InlineEdit()
       continue
     endif
 
-    let end = line('.') - 1
+    let end    = line('.') - 1
+    let indent = indent(end)
 
     call inline_edit#PopCursor()
 
     let proxy_buffer = inline_edit#proxy_buffer#New()
-    call proxy_buffer.Init(start, end, filetype)
+    call proxy_buffer.Init(start, end, filetype, indent)
 
     return
   endfor
