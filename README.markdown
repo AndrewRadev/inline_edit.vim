@@ -1,5 +1,3 @@
-# Rough, kinda-almost-working draft
-
 Editing javascript within HTML is annoying. Solution:
 
 ``` html
@@ -12,7 +10,9 @@ Editing javascript within HTML is annoying. Solution:
 </script>
 ```
 
-Execute `:InlineEdit` within the script tag. A proxy buffer is opened with *only* the javascript. Saving the proxy buffer updates the original one. You can reindent, lint, slice and dice as much as you like.
+Execute `:InlineEdit` within the script tag. A proxy buffer is opened with
+*only* the javascript. Saving the proxy buffer updates the original one. You
+can reindent, lint, slice and dice as much as you like.
 
 Same thing for sql within ruby:
 
