@@ -5,7 +5,6 @@ function! inline_edit#proxy_buffer#New()
         \ 'filetype':        '',
         \ 'start':           -1,
         \ 'end':             -1,
-        \ 'is_blank':        1,
         \
         \ 'Init':                 function('inline_edit#proxy_buffer#Init'),
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy_buffer#UpdateOriginalBuffer'),
@@ -19,7 +18,6 @@ function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype) dict
   let self.start           = a:start_line
   let self.end             = a:end_line
   let self.filetype        = a:filetype
-  let self.is_blank        = 0
 
   let lines     = getbufline('%', self.start, self.end)
   let temp_file = tempname()
