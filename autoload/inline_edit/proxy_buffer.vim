@@ -29,13 +29,13 @@ function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype, indent) 
   exe 'split ' . tempname()
   call append(0, lines)
   normal! Gdd
-  set nomodified
+  write
   set foldlevel=99
   let self.proxy_buffer = bufnr('%')
 
   call s:SetupBuffer(self)
 
-  autocmd BufWrite <buffer> silent call b:proxy.UpdateOriginalBuffer()
+  autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
 endfunction
 
 " TODO (2011-11-26) Handle noexpandtab
