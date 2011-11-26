@@ -48,4 +48,6 @@ function! inline_edit#proxy_buffer#UpdateOriginalBuffer() dict
   call append(self.start - 1, new_lines)
   call inline_edit#PopCursor()
   exe 'buffer ' . self.proxy_buffer
+
+  let self.end = self.start + len(new_lines) - 1
 endfunction
