@@ -29,12 +29,12 @@ function! s:InlineEdit()
     endif
 
     let end    = line('.') - 1
-    let indent = indent(end)
+    let indent = indent(end) " TODO (2011-11-27) Do something smarter here?
 
     call inline_edit#PopCursor()
 
-    let proxy_buffer = inline_edit#proxy_buffer#New()
-    call proxy_buffer.Init(start, end, filetype, indent)
+    let proxy = inline_edit#proxy#New()
+    call proxy.Init(start, end, filetype, indent)
 
     return
   endfor

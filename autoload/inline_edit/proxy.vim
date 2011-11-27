@@ -1,5 +1,5 @@
-function! inline_edit#proxy_buffer#New()
-  let proxy_buffer = {
+function! inline_edit#proxy#New()
+  return {
         \ 'original_buffer': -1,
         \ 'proxy_buffer':    -1,
         \ 'filetype':        '',
@@ -7,14 +7,12 @@ function! inline_edit#proxy_buffer#New()
         \ 'end':             -1,
         \ 'indent':          -1,
         \
-        \ 'Init':                 function('inline_edit#proxy_buffer#Init'),
-        \ 'UpdateOriginalBuffer': function('inline_edit#proxy_buffer#UpdateOriginalBuffer'),
+        \ 'Init':                 function('inline_edit#proxy#Init'),
+        \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer'),
         \ }
-
-  return proxy_buffer
 endfunction
 
-function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype, indent) dict
+function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   let self.original_buffer = bufnr('%')
   let self.start           = a:start_line
   let self.end             = a:end_line
@@ -39,7 +37,7 @@ function! inline_edit#proxy_buffer#Init(start_line, end_line, filetype, indent) 
 endfunction
 
 " TODO (2011-11-26) Handle noexpandtab
-function! inline_edit#proxy_buffer#UpdateOriginalBuffer() dict
+function! inline_edit#proxy#UpdateOriginalBuffer() dict
   let leading_whitespace = repeat(' ', self.indent)
 
   let new_lines = []
