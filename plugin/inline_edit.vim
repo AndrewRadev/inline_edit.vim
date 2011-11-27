@@ -1,9 +1,9 @@
 if !exists('g:inline_edit_patterns')
   let g:inline_edit_patterns = [
-        \ ['```\s*ruby',      '```',       'ruby'],
-        \ ['<<-\?SQL',        '^\s*SQL',   'sql'],
-        \ ['<script\>[^>]*>', '</script>', 'javascript'],
-        \ ['{% block [^>]* %}', '{% endblock %}', 'htmldjango'],
+        \ ['```\s*ruby',       '```',                'ruby'],
+        \ ['<<-\?SQL',         '^\s*SQL',            'sql'],
+        \ ['<script\>[^>]*>',  '</script>',          'javascript'],
+        \ ['{%\s*block\>.*%}', '{%\s*endblock\s*%}', 'htmldjango'],
         \ ]
 endif
 
