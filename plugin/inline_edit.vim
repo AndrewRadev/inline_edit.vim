@@ -7,6 +7,10 @@ if !exists('g:inline_edit_patterns')
         \ ]
 endif
 
+if !exists('g:inline_edit_autowrite')
+  let g:inline_edit_autowrite = 0
+endif
+
 command! InlineEdit call s:InlineEdit()
 function! s:InlineEdit()
   for entry in g:inline_edit_patterns

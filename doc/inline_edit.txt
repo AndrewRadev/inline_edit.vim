@@ -46,7 +46,16 @@ SETTINGS                                                  *inline-edit-settings*
 
 These are the variables that control the behaviour of the plugin.
 
-TODO
+                                                 *b:inline_edit_autowrite*
+>
+    let b:inline_edit_autowrite = 0
+<
+
+Default value: 0
+
+If this variable is set to 1, writing the temporary proxy buffer would also
+write the original buffer to its file. If it's 0, the original buffer will be
+modified, but not saved.
 
 ==============================================================================
 INTERNALS                                                *inline-edit-internals*

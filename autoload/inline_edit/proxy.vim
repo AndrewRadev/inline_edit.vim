@@ -52,6 +52,9 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   call cursor(self.start, 1)
   exe 'normal! ' . (self.end - self.start + 1) . 'dd'
   call append(self.start - 1, new_lines)
+  if g:inline_edit_autowrite
+    write
+  endif
   call inline_edit#PopCursor()
   exe 'buffer ' . self.proxy_buffer
 
@@ -63,6 +66,7 @@ function! s:SetupBuffer(proxy)
   let b:proxy   = a:proxy
   let &filetype = b:proxy.filetype
 
+  " TODO (2011-11-27) Configurable statusline?
   let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
