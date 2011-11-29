@@ -145,6 +145,7 @@ ISSUES                                                      *inline-edit-issues*
 - Won't work quite right with expandtab on.
 - Indentation is set to the one of the last line of the embedded text. This
   might cause issues if it varies.
+- The cursor is not positioned quite right in the new buffer after saving.
 - Markdown editing should work in the common case, but only works for ruby for
   the moment.
 - The patterns should be filetype-specific.

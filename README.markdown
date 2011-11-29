@@ -50,7 +50,7 @@ can reindent, lint, slice and dice as much as you like.
   Some other text.
 </pre>
 
-- Django blocks in templates
+- Django blocks in templates (Thanks to [@Vladimiroff](https://github.com/Vladimiroff))
 
 ``` htmldjango
     {%  block content %}
