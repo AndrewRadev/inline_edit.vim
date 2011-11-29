@@ -47,8 +47,25 @@ can reindent, lint, slice and dice as much as you like.
   end
   ```
 
-  Some other text
+  Some other text.
 </pre>
+
+- Django blocks in templates
+
+``` htmldjango
+    {%  block content %}
+    <h1>{{ section.title }}</h1>
+
+    {% for story in story_list %}
+    <h2>
+      <a href="{{ story.get_absolute_url }}">
+        {{ story.headline|upper }}
+      </a>
+    </h2>
+    <p>{{ story.tease|truncatewords:"100" }}</p>
+    {% endfor %}
+    {% endblock %}
+```
 
 ## Known issues
 

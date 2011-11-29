@@ -39,7 +39,71 @@ Note that this example uses the current |mapleader|.
 ==============================================================================
 USAGE                                                        *inline-edit-usage*
 
-TODO
+The idea of this plugin is to enable isolated editing of a specific area of a
+buffer. This could be used for editing javascript within HTML, for example:
+
+>
+    <head>
+      <script type="text/javascript">
+        alert("OK");
+      </script>
+    </head>
+<
+Now, executing the command |:InlineEdit| when the cursor is within the
+<script> tag would open a split with a temporary buffer with the contents of
+the script tag. Editing and saving this proxy buffer would update the original
+one. If |g:inline_edit_autowrite| is set to 1, the original buffer will be
+saved as well.
+
+The plugin works for various different constructs. In the future, I intend to
+have a nice-ish interface for adding new patterns. For the moment, you're
+welcome to poke inside |g:inline_edit_patterns|, which is explained in
+|inline-edit-patterns|.
+
+Here's what the plugin currently works for:
+
+Javascript within HTML ~
+>
+    <script type="text/javascript">
+       $(document).ready(function() {
+         $('#foo').click(function() {
+           alert('OK');
+         });
+       })
+    </script>
+<
+
+SQL within ruby (matches "<<-SQL") ~
+>
+    def some_heavy_query
+      execute <<-SQL
+        SELECT * FROM users WHERE something = 'other';
+      SQL
+    end
+<
+
+Ruby code within markdown blocks ~
+>
+    Some text.
+
+    ``` ruby
+    def foo
+      puts "OK"
+    end
+    ```
+
+    Some other text.
+<
+
+Blocks in django templates ~
+>
+    <body>
+      {% block content %}
+      <h1>{{ section.title }}</h1>
+      {% endblock %}
+    </body>
+<
+
 
 ==============================================================================
 SETTINGS                                                  *inline-edit-settings*
@@ -57,15 +121,33 @@ If this variable is set to 1, writing the temporary proxy buffer would also
 write the original buffer to its file. If it's 0, the original buffer will be
 modified, but not saved.
 
+
 ==============================================================================
 INTERNALS                                                *inline-edit-internals*
+                                                        *g:inline_edit_patterns*
 
-TODO
+The variable |g:inline_edit_patterns| contains a list of triplets. For each
+entry, the first and second items are start and end patterns, the third one is
+a filetype. The patterns are used to find the contents of the embedded text to
+edit. The filetype of the proxy buffer is set to the given filetype. This
+means you could extend this by appending to the variable. At this time, this
+is not recommended, since the format is probably going to change soonish.
+
+For example, this will let you edit the insides of a vim function:
+>
+    let g:inline_edit_patterns = [ ['\<function\>', '\<endfunction\>', 'vim'] ]
+<
+
 
 ==============================================================================
 ISSUES                                                      *inline-edit-issues*
 
-TODO
+- Won't work quite right with expandtab on.
+- Indentation is set to the one of the last line of the embedded text. This
+  might cause issues if it varies.
+- Markdown editing should work in the common case, but only works for ruby for
+  the moment.
+- The patterns should be filetype-specific.
 
 Any other issues and suggestions are very welcome on the github bugtracker:
 https://github.com/AndrewRadev/inline_edit.vim/issues
