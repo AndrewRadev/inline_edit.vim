@@ -62,15 +62,22 @@ welcome to poke inside |g:inline_edit_patterns|, which is explained in
 
 Here's what the plugin currently works for:
 
-Javascript within HTML ~
+Javascript and CSS within HTML ~
 >
+  <head>
     <script type="text/javascript">
-       $(document).ready(function() {
-         $('#foo').click(function() {
-           alert('OK');
-         });
-       })
+      $(document).ready(function() {
+        alert('OK');
+      })
     </script>
+
+    <style>
+      body {
+        color: blue;
+        background-color: red;
+      }
+    </style>
+  </head>
 <
 
 SQL within ruby (matches "<<-SQL") ~
