@@ -23,7 +23,7 @@ The command is (provided you're in ~/.vim):
 >
     git submodule add git://github.com/AndrewRadev/inline_edit.vim.git bundle/inline_edit
 <
-Another way is to simply copy all the essential directories inside the ~.vim/
+Another way is to simply copy all the essential directories inside the ~/.vim
 directory: plugin, autoload, doc.
 
 After the plugin is installed, the command |:InlineEdit| will attempt to
