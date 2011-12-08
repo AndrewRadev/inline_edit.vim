@@ -20,8 +20,25 @@ if !exists('g:inline_edit_autowrite')
   let g:inline_edit_autowrite = 0
 endif
 
-command! InlineEdit call s:InlineEdit()
-function! s:InlineEdit()
+command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
+function! s:InlineEdit(count, filetype)
+  if a:count > 0
+    " then an area has been marked in visual mode
+    let [start, end] = [line("'<"), line("'>")]
+    let indent = indent(end)
+
+    if a:filetype != ''
+      let filetype = a:filetype
+    else
+      let filetype = &filetype
+    endif
+
+    let proxy = inline_edit#proxy#New()
+    call proxy.Init(start, end, filetype, indent)
+
+    return
+  endif
+
   for entry in g:inline_edit_patterns
     call inline_edit#PushCursor()
 
