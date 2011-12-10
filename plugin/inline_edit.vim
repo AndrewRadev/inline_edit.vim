@@ -7,13 +7,42 @@ let s:keepcpo            = &cpo
 set cpo&vim
 
 if !exists('g:inline_edit_patterns')
-  let g:inline_edit_patterns = [
-        \ ['```\s*ruby',       '```',                'ruby'],
-        \ ['<<-\?SQL',         '^\s*SQL',            'sql'],
-        \ ['<script\>[^>]*>',  '</script>',          'javascript'],
-        \ ['<style\>[^>]*>',   '</style>',           'css'],
-        \ ['{%\s*block\>.*%}', '{%\s*endblock\s*%}', 'htmldjango'],
-        \ ]
+  let g:inline_edit_patterns = []
+
+  call add(g:inline_edit_patterns, {
+        \ 'main_filetype': 'markdown',
+        \ 'sub_filetype':  'ruby',
+        \ 'start_pattern': '```\s*ruby',
+        \ 'end_pattern':   '```',
+        \ })
+
+  call add(g:inline_edit_patterns, {
+        \ 'main_filetype': 'ruby',
+        \ 'sub_filetype':  'sql',
+        \ 'start_pattern': '<<-\?SQL',
+        \ 'end_pattern':   '^\s*SQL',
+        \ })
+
+  call add(g:inline_edit_patterns, {
+        \ 'main_filetype': 'html',
+        \ 'sub_filetype':  'javascript',
+        \ 'start_pattern': '<script\>[^>]*>',
+        \ 'end_pattern':   '</script>',
+        \ })
+
+  call add(g:inline_edit_patterns, {
+        \ 'main_filetype': 'html',
+        \ 'sub_filetype':  'css',
+        \ 'start_pattern': '<style\>[^>]*>',
+        \ 'end_pattern':   '</style>',
+        \ })
+
+  call add(g:inline_edit_patterns, {
+        \ 'main_filetype': 'htmldjango',
+        \ 'sub_filetype':  'htmldjango',
+        \ 'start_pattern': '{%\s*block\>.*%}',
+        \ 'end_pattern':   '{%\s*endblock\s*%}',
+        \ })
 endif
 
 if !exists('g:inline_edit_autowrite')
@@ -40,12 +69,14 @@ function! s:InlineEdit(count, filetype)
   endif
 
   for entry in g:inline_edit_patterns
+    if entry.main_filetype !~ &filetype
+      continue
+    endif
+
     call inline_edit#PushCursor()
 
-    let [start_pattern, end_pattern, filetype] = entry
-
     " find start of area
-    if searchpair(start_pattern, '', end_pattern, 'Wb') <= 0
+    if searchpair(entry.start_pattern, '', entry.end_pattern, 'Wb') <= 0
       call inline_edit#PopCursor()
       continue
     endif
@@ -53,7 +84,7 @@ function! s:InlineEdit(count, filetype)
     let start = line('.') + 1
 
     " find end of area
-    if searchpair(start_pattern, '', end_pattern, 'W') <= 0
+    if searchpair(entry.start_pattern, '', entry.end_pattern, 'W') <= 0
       call inline_edit#PopCursor()
       continue
     endif
@@ -64,7 +95,7 @@ function! s:InlineEdit(count, filetype)
     call inline_edit#PopCursor()
 
     let proxy = inline_edit#proxy#New()
-    call proxy.Init(start, end, filetype, indent)
+    call proxy.Init(start, end, entry.sub_filetype, indent)
 
     return
   endfor
