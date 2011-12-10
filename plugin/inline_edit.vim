@@ -53,50 +53,57 @@ command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
 function! s:InlineEdit(count, filetype)
   if a:count > 0
     " then an area has been marked in visual mode
-    let [start, end] = [line("'<"), line("'>")]
-    let indent = indent(end)
+    call s:VisualInlineEdit()
+  else
+    for entry in g:inline_edit_patterns
+      if entry.main_filetype !~ &filetype
+        continue
+      endif
 
-    if a:filetype != ''
-      let filetype = a:filetype
-    else
-      let filetype = &filetype
-    endif
+      if s:PatternInlineEdit(entry)
+        return
+      endif
+    endfor
+  endif
+endfunction
 
-    let proxy = inline_edit#proxy#New()
-    call proxy.Init(start, end, filetype, indent)
+function! s:VisualInlineEdit()
+  let [start, end] = [line("'<"), line("'>")]
+  let indent = indent(end)
 
-    return
+  if a:filetype != ''
+    let filetype = a:filetype
+  else
+    let filetype = &filetype
   endif
 
-  for entry in g:inline_edit_patterns
-    if entry.main_filetype !~ &filetype
-      continue
-    endif
+  let proxy = inline_edit#proxy#New()
+  call proxy.Init(start, end, filetype, indent)
+endfunction
 
-    call inline_edit#PushCursor()
+function! s:PatternInlineEdit(pattern)
+  call inline_edit#PushCursor()
 
-    " find start of area
-    if searchpair(entry.start_pattern, '', entry.end_pattern, 'Wb') <= 0
-      call inline_edit#PopCursor()
-      continue
-    endif
-
-    let start = line('.') + 1
-
-    " find end of area
-    if searchpair(entry.start_pattern, '', entry.end_pattern, 'W') <= 0
-      call inline_edit#PopCursor()
-      continue
-    endif
-
-    let end    = line('.') - 1
-    let indent = indent(end) " TODO (2011-11-27) Do something smarter here?
-
+  " find start of area
+  if searchpair(a:pattern.start_pattern, '', a:pattern.end_pattern, 'Wb') <= 0
     call inline_edit#PopCursor()
+    return 0
+  endif
+  let start = line('.') + 1
 
-    let proxy = inline_edit#proxy#New()
-    call proxy.Init(start, end, entry.sub_filetype, indent)
+  " find end of area
+  if searchpair(a:pattern.start_pattern, '', a:pattern.end_pattern, 'W') <= 0
+    call inline_edit#PopCursor()
+    return 0
+  endif
+  let end    = line('.') - 1
 
-    return
-  endfor
+  call inline_edit#PopCursor()
+
+  let indent = indent(end) " TODO (2011-11-27) Do something smarter here?
+
+  let proxy = inline_edit#proxy#New()
+  call proxy.Init(start, end, a:pattern.sub_filetype, indent)
+
+  return 1
 endfunction
