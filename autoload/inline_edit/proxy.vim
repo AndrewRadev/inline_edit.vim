@@ -9,6 +9,7 @@ function! inline_edit#proxy#New()
         \
         \ 'Init':                 function('inline_edit#proxy#Init'),
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer'),
+        \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
 endfunction
 
@@ -18,6 +19,12 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   let self.end             = a:end_line
   let self.filetype        = a:filetype
   let self.indent          = a:indent
+
+  " Store all proxy buffers in the original one
+  if !exists('b:proxy_buffers')
+    let b:proxy_buffers = []
+  endif
+  call add(b:proxy_buffers, self)
 
   let lines = []
   for line in getbufline('%', self.start, self.end)
@@ -55,11 +62,44 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   if g:inline_edit_autowrite
     write
   endif
+  " store other proxies for further updating
+  let other_proxies = b:proxy_buffers
   call inline_edit#PopCursor()
   exe 'buffer ' . self.proxy_buffer
 
-  let self.end = self.start + len(new_lines) - 1
+  " Keep the difference in lines to know how to update the other differ if
+  " necessary.
+  let line_count     = self.end - self.start + 1
+  let new_line_count = len(new_lines)
+
+  let self.end = self.start + new_line_count - 1
   call s:SetupBuffer(self)
+
+  call self.UpdateOtherProxies(other_proxies, new_line_count - line_count)
+endfunction
+
+" If any of the other proxies are located below this one, we need to update
+" their starting and ending lines, since any change would result in a line
+" shift.
+"
+" a:proxies is the list of related proxies, possibly including this one
+" a:delta is the change in the number of lines.
+function! inline_edit#proxy#UpdateOtherProxies(proxies, delta) dict
+  if a:delta == 0
+    return
+  endif
+
+  for other in a:proxies
+    if other == self
+      continue
+    endif
+
+    if self.original_buffer == other.original_buffer
+          \ && self.end <= other.start
+      let other.start = other.start + a:delta
+      let other.end   = other.end   + a:delta
+    endif
+  endfor
 endfunction
 
 function! s:SetupBuffer(proxy)
