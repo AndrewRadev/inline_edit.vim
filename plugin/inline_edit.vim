@@ -79,8 +79,7 @@ function! s:VisualInlineEdit()
     let filetype = &filetype
   endif
 
-  let proxy = inline_edit#proxy#New()
-  call proxy.Init(start, end, filetype, indent)
+  call inline_edit#proxy#New(start, end, filetype, indent)
 endfunction
 
 function! s:PatternInlineEdit(pattern)
@@ -104,8 +103,7 @@ function! s:PatternInlineEdit(pattern)
 
   let indent = indent(end) " TODO (2011-11-27) Do something smarter here?
 
-  let proxy = inline_edit#proxy#New()
-  call proxy.Init(start, end, a:pattern.sub_filetype, indent)
+  call inline_edit#proxy#New(start, end, a:pattern.sub_filetype, indent)
 
   return 1
 endfunction

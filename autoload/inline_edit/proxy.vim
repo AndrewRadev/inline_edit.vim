@@ -1,5 +1,5 @@
 function! inline_edit#proxy#New()
-  return {
+  let proxy = {
         \ 'original_buffer': -1,
         \ 'proxy_buffer':    -1,
         \ 'filetype':        '',
@@ -11,6 +11,9 @@ function! inline_edit#proxy#New()
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer'),
         \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
+
+  call proxy.Init()
+  return proxy
 endfunction
 
 function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
