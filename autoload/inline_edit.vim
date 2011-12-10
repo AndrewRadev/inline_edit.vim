@@ -1,3 +1,5 @@
+" vim: set foldmethod=marker
+
 " Cursor stack manipulation {{{1
 "
 " In order to make the pattern of saving the cursor and restoring it
@@ -37,4 +39,40 @@ endfunction
 " Note that if the cursor hasn't been saved at all, this will raise an error.
 function! inline_edit#PeekCursor()
   return b:cursor_position_stack[-1]
+endfunction
+
+" Callback functions {{{1
+
+" function! inline_edit#MarkdownFencedCode() {{{2
+"
+" Opens up a new proxy buffer with the contents of a fenced code block in
+" github-flavoured markdown.
+function! inline_edit#MarkdownFencedCode()
+  let start_pattern = '``` \(.*\)'
+  let end_pattern   = '```'
+
+  call inline_edit#PushCursor()
+
+  " find start of area
+  if searchpair(start_pattern, '', end_pattern, 'Wb') <= 0
+    call inline_edit#PopCursor()
+    return 0
+  endif
+  let start    = line('.') + 1
+  let filetype = matchlist(getline('.'), start_pattern, 0)[1]
+
+  " find end of area
+  if searchpair(start_pattern, '', end_pattern, 'W') <= 0
+    call inline_edit#PopCursor()
+    return 0
+  endif
+  let end    = line('.') - 1
+  let indent = indent('.')
+
+  call inline_edit#PopCursor()
+
+  let proxy = inline_edit#proxy#New()
+  call proxy.Init(start, end, filetype, indent)
+
+  return 1
 endfunction

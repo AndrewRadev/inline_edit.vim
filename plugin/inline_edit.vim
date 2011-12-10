@@ -11,9 +11,7 @@ if !exists('g:inline_edit_patterns')
 
   call add(g:inline_edit_patterns, {
         \ 'main_filetype': 'markdown',
-        \ 'sub_filetype':  'ruby',
-        \ 'start_pattern': '```\s*ruby',
-        \ 'end_pattern':   '```',
+        \ 'callback':      'inline_edit#MarkdownFencedCode',
         \ })
 
   call add(g:inline_edit_patterns, {
@@ -60,7 +58,11 @@ function! s:InlineEdit(count, filetype)
         continue
       endif
 
-      if s:PatternInlineEdit(entry)
+      if has_key(entry, 'callback')
+        if call(entry.callback, [])
+          return
+        endif
+      elseif s:PatternInlineEdit(entry)
         return
       endif
     endfor
@@ -96,7 +98,7 @@ function! s:PatternInlineEdit(pattern)
     call inline_edit#PopCursor()
     return 0
   endif
-  let end    = line('.') - 1
+  let end = line('.') - 1
 
   call inline_edit#PopCursor()
 
