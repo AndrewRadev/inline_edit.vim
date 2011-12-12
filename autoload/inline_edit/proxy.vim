@@ -1,4 +1,4 @@
-function! inline_edit#proxy#New()
+function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
   let proxy = {
         \ 'original_buffer': -1,
         \ 'proxy_buffer':    -1,
@@ -12,7 +12,7 @@ function! inline_edit#proxy#New()
         \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
 
-  call proxy.Init()
+  call proxy.Init(a:start_line, a:end_line, a:filetype, a:indent)
   return proxy
 endfunction
 

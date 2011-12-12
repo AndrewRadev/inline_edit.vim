@@ -71,8 +71,7 @@ function! inline_edit#MarkdownFencedCode()
 
   call inline_edit#PopCursor()
 
-  let proxy = inline_edit#proxy#New()
-  call proxy.Init(start, end, filetype, indent)
+  let proxy = inline_edit#proxy#New(start, end, filetype, indent)
 
   return 1
 endfunction
