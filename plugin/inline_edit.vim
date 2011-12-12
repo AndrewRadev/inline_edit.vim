@@ -8,44 +8,45 @@ set cpo&vim
 
 if !exists('g:inline_edit_patterns')
   let g:inline_edit_patterns = []
-
-  call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'markdown',
-        \ 'callback':      'inline_edit#MarkdownFencedCode',
-        \ })
-
-  call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'ruby',
-        \ 'sub_filetype':  'sql',
-        \ 'start_pattern': '<<-\?SQL',
-        \ 'end_pattern':   '^\s*SQL',
-        \ })
-
-  call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'html',
-        \ 'sub_filetype':  'javascript',
-        \ 'start_pattern': '<script\>[^>]*>',
-        \ 'end_pattern':   '</script>',
-        \ })
-
-  call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'html',
-        \ 'sub_filetype':  'css',
-        \ 'start_pattern': '<style\>[^>]*>',
-        \ 'end_pattern':   '</style>',
-        \ })
-
-  call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'htmldjango',
-        \ 'sub_filetype':  'htmldjango',
-        \ 'start_pattern': '{%\s*block\>.*%}',
-        \ 'end_pattern':   '{%\s*endblock\s*%}',
-        \ })
 endif
 
 if !exists('g:inline_edit_autowrite')
   let g:inline_edit_autowrite = 0
 endif
+
+" Default patterns
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'markdown',
+      \ 'callback':      'inline_edit#MarkdownFencedCode',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'ruby',
+      \ 'sub_filetype':  'sql',
+      \ 'start_pattern': '<<-\?SQL',
+      \ 'end_pattern':   '^\s*SQL',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'html',
+      \ 'sub_filetype':  'javascript',
+      \ 'start_pattern': '<script\>[^>]*>',
+      \ 'end_pattern':   '</script>',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'html',
+      \ 'sub_filetype':  'css',
+      \ 'start_pattern': '<style\>[^>]*>',
+      \ 'end_pattern':   '</style>',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'htmldjango',
+      \ 'sub_filetype':  'htmldjango',
+      \ 'start_pattern': '{%\s*block\>.*%}',
+      \ 'end_pattern':   '{%\s*endblock\s*%}',
+      \ })
 
 command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
 function! s:InlineEdit(count, filetype)
