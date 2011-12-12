@@ -28,14 +28,14 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype': 'html',
+      \ 'main_filetype': 'html\|eruby',
       \ 'sub_filetype':  'javascript',
       \ 'start_pattern': '<script\>[^>]*>',
       \ 'end_pattern':   '</script>',
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype': 'html',
+      \ 'main_filetype': 'html\|eruby',
       \ 'sub_filetype':  'css',
       \ 'start_pattern': '<style\>[^>]*>',
       \ 'end_pattern':   '</style>',
@@ -55,7 +55,7 @@ function! s:InlineEdit(count, filetype)
     call s:VisualInlineEdit()
   else
     for entry in g:inline_edit_patterns
-      if entry.main_filetype !~ &filetype
+      if &filetype !~ entry.main_filetype
         continue
       endif
 
