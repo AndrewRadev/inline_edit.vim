@@ -34,6 +34,8 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
     call add(lines, substitute(line, '^\s\{'.self.indent.'}', '', ''))
   endfor
 
+
+  let position = getpos('.')
   exe 'split ' . tempname()
   call append(0, lines)
   normal! Gdd
@@ -42,6 +44,10 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   let self.proxy_buffer = bufnr('%')
 
   call s:SetupBuffer(self)
+
+  let position[0] = bufnr(self.proxy_buffer)
+  let position[1] = position[1] - self.start + 1
+  call setpos('.', position)
 
   autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
 endfunction
@@ -54,6 +60,8 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   for line in getbufline('%', 0, '$')
     call add(new_lines, leading_whitespace.line)
   endfor
+
+  call inline_edit#PushCursor()
 
   " Switch to the original buffer, delete the relevant lines, add the new
   " ones, switch back to the diff buffer.
@@ -77,6 +85,7 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   let self.end = self.start + new_line_count - 1
   call s:SetupBuffer(self)
+  call inline_edit#PopCursor()
 
   call self.UpdateOtherProxies(other_proxies, new_line_count - line_count)
 endfunction
