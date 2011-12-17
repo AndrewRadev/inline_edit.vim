@@ -1,5 +1,3 @@
-*(Note: Still early in development, but should be usable.)*
-
 ## Problem
 
 Editing javascript within HTML is annoying. To generalize, editing code that's

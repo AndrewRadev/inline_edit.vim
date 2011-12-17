@@ -21,31 +21,33 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype': 'ruby',
-      \ 'sub_filetype':  'sql',
-      \ 'start_pattern': '<<-\?SQL',
-      \ 'end_pattern':   '^\s*SQL',
+      \ 'main_filetype':     'ruby',
+      \ 'sub_filetype':      'sql',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<<-\?SQL',
+      \ 'end':               '^\s*SQL',
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype': 'html\|eruby',
-      \ 'sub_filetype':  'javascript',
-      \ 'start_pattern': '<script\>[^>]*>',
-      \ 'end_pattern':   '</script>',
+      \ 'main_filetype':     'html\|eruby\|php',
+      \ 'sub_filetype':      'javascript',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<script\>[^>]*>',
+      \ 'end':               '</script>',
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype': 'html\|eruby',
-      \ 'sub_filetype':  'css',
-      \ 'start_pattern': '<style\>[^>]*>',
-      \ 'end_pattern':   '</style>',
+      \ 'main_filetype':     'html\|eruby\|php',
+      \ 'sub_filetype':      'css',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<style\>[^>]*>',
+      \ 'end':               '</style>',
       \ })
 
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'htmldjango',
-      \ 'sub_filetype':  'htmldjango',
-      \ 'start_pattern': '{%\s*block\>.*%}',
-      \ 'end_pattern':   '{%\s*endblock\s*%}',
+      \ 'start':         '{%\s*block\>.*%}',
+      \ 'end':           '{%\s*endblock\s*%}',
       \ })
 
 command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
@@ -55,12 +57,15 @@ function! s:InlineEdit(count, filetype)
     call s:VisualInlineEdit()
   else
     for entry in g:inline_edit_patterns
-      if &filetype !~ entry.main_filetype
+      if has_key(entry, 'main_filetype') && &filetype !~ entry.main_filetype
         continue
       endif
 
       if has_key(entry, 'callback')
-        if call(entry.callback, [])
+        let result = call(entry.callback, [])
+
+        if !empty(result)
+          call call('inline_edit#proxy#New', result)
           return
         endif
       elseif s:PatternInlineEdit(entry)
@@ -84,27 +89,31 @@ function! s:VisualInlineEdit()
 endfunction
 
 function! s:PatternInlineEdit(pattern)
+  let pattern = extend({
+        \ 'sub_filetype':      &filetype,
+        \ 'indent_adjustment': 0,
+        \ }, a:pattern)
+
   call inline_edit#PushCursor()
 
   " find start of area
-  if searchpair(a:pattern.start_pattern, '', a:pattern.end_pattern, 'Wb') <= 0
+  if searchpair(pattern.start, '', pattern.end, 'Wb') <= 0
     call inline_edit#PopCursor()
     return 0
   endif
   let start = line('.') + 1
 
   " find end of area
-  if searchpair(a:pattern.start_pattern, '', a:pattern.end_pattern, 'W') <= 0
+  if searchpair(pattern.start, '', pattern.end, 'W') <= 0
     call inline_edit#PopCursor()
     return 0
   endif
-  let end = line('.') - 1
+  let end    = line('.') - 1
+  let indent = indent(line('.')) + pattern.indent_adjustment * (&et ? &sw : &ts)
 
   call inline_edit#PopCursor()
 
-  let indent = indent(end) " TODO (2011-11-27) Do something smarter here?
-
-  call inline_edit#proxy#New(start, end, a:pattern.sub_filetype, indent)
+  call inline_edit#proxy#New(start, end, pattern.sub_filetype, indent)
 
   return 1
 endfunction

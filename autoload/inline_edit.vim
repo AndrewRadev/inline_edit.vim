@@ -48,15 +48,15 @@ endfunction
 " Opens up a new proxy buffer with the contents of a fenced code block in
 " github-flavoured markdown.
 function! inline_edit#MarkdownFencedCode()
-  let start_pattern = '``` \(.*\)'
-  let end_pattern   = '```'
+  let start_pattern = '^\s*``` \(.\+\)'
+  let end_pattern   = '^\s*```\s*$'
 
   call inline_edit#PushCursor()
 
   " find start of area
   if searchpair(start_pattern, '', end_pattern, 'Wb') <= 0
     call inline_edit#PopCursor()
-    return 0
+    return []
   endif
   let start    = line('.') + 1
   let filetype = matchlist(getline('.'), start_pattern, 0)[1]
@@ -64,14 +64,12 @@ function! inline_edit#MarkdownFencedCode()
   " find end of area
   if searchpair(start_pattern, '', end_pattern, 'W') <= 0
     call inline_edit#PopCursor()
-    return 0
+    return []
   endif
   let end    = line('.') - 1
   let indent = indent('.')
 
   call inline_edit#PopCursor()
 
-  let proxy = inline_edit#proxy#New(start, end, filetype, indent)
-
-  return 1
+  return [start, end, filetype, indent]
 endfunction
