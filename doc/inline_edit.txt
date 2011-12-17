@@ -31,9 +31,16 @@ locate the area to edit and then open up a temporary buffer to edit only that
 area. To make this more comfortable to do often, it's recommended to create a
 mapping that calls it. For example:
 >
+    " normal mode:
     nnoremap <leader>e :InlineEdit<cr>
-<
-Note that this example uses the current |mapleader|.
+
+    " visual mode:
+    xnoremap <leader>e :InlineEdit<cr>
+
+    " insert mode:
+    inoremap <c-e> <esc>:InlineEdit<cr>a
+
+Note that these examples use the current |mapleader|.
 
 
 ==============================================================================
@@ -55,12 +62,13 @@ the script tag. Editing and saving this proxy buffer would update the original
 one. If |g:inline_edit_autowrite| is set to 1, the original buffer will be
 saved as well.
 
-The plugin works for various different constructs. In the future, I intend to
-have a nice-ish interface for adding new patterns. For the moment, you're
-welcome to poke inside |g:inline_edit_patterns|, which is explained in
-|inline-edit-patterns|.
+The plugin works for various different constructs. If you're interested in
+extending its functionality to fit your own needs, see |inline-edit-extending|
+below. If you think of a nice one that might be useful to other people, feel
+free to suggest adding it to the plugin in the github issue tracker:
+https://github.com/AndrewRadev/inline_edit.vim/issues
 
-Here's what the plugin currently works for:
+Here's what the plugin currently works for out of the box:
 
 Javascript and CSS within HTML ~
 >
@@ -110,6 +118,12 @@ Blocks in django templates ~
       {% endblock %}
     </body>
 <
+
+Visual Mode ~
+
+If you'd like to work on an area that's not very well definable, |:InlineEdit|
+also works in visual mode. Selecting an area of the code and executing
+:InlineEdit will open up a proxy buffer with that area.
 
 
 ==============================================================================

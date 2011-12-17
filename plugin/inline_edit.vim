@@ -54,7 +54,7 @@ command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
 function! s:InlineEdit(count, filetype)
   if a:count > 0
     " then an area has been marked in visual mode
-    call s:VisualInlineEdit()
+    call s:VisualInlineEdit(a:filetype)
   else
     for entry in g:inline_edit_patterns
       if has_key(entry, 'main_filetype') && &filetype !~ entry.main_filetype
@@ -75,7 +75,7 @@ function! s:InlineEdit(count, filetype)
   endif
 endfunction
 
-function! s:VisualInlineEdit()
+function! s:VisualInlineEdit(filetype)
   let [start, end] = [line("'<"), line("'>")]
   let indent = indent(end)
 
