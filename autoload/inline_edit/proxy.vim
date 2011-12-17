@@ -21,7 +21,7 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   let self.start           = a:start_line
   let self.end             = a:end_line
   let self.filetype        = a:filetype
-  let self.indent          = a:indent
+  let self.indent          = &et ? a:indent : a:indent / &ts
 
   " Store all proxy buffers in the original one
   if !exists('b:proxy_buffers')
@@ -33,7 +33,6 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   for line in getbufline('%', self.start, self.end)
     call add(lines, substitute(line, '^\s\{'.self.indent.'}', '', ''))
   endfor
-
 
   let position = getpos('.')
   exe 'split ' . tempname()
@@ -52,9 +51,12 @@ function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
   autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
 endfunction
 
-" TODO (2011-11-26) Handle noexpandtab
 function! inline_edit#proxy#UpdateOriginalBuffer() dict
-  let leading_whitespace = repeat(' ', self.indent)
+  if getbufvar(self.original_buffer, '&expandtab')
+    let leading_whitespace = repeat(' ', self.indent)
+  else
+    let leading_whitespace = repeat("\t", self.indent)
+  endif
 
   let new_lines = []
   for line in getbufline('%', 0, '$')
@@ -118,7 +120,6 @@ function! s:SetupBuffer(proxy)
   let b:proxy   = a:proxy
   let &filetype = b:proxy.filetype
 
-  " TODO (2011-11-27) Configurable statusline?
   let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')

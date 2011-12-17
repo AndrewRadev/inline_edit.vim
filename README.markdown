@@ -66,8 +66,3 @@ can reindent, lint, slice and dice as much as you like.
     {% endfor %}
     {% endblock %}
 ```
-
-## Known issues
-
-- The indentation is adjusted correctly only when spaces are used (soft tabs)
-- The cursor is not positioned quite right in the new buffer after saving
