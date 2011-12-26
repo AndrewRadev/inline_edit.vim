@@ -21,6 +21,11 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'vim',
+      \ 'callback':      'inline_edit#VimEmbeddedScript'
+      \ })
+
+call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'ruby',
       \ 'sub_filetype':      'sql',
       \ 'indent_adjustment': 1,

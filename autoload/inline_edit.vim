@@ -73,3 +73,31 @@ function! inline_edit#MarkdownFencedCode()
 
   return [start, end, filetype, indent]
 endfunction
+
+" function! inline_edit#VimEmbeddedScript() {{{2
+"
+" Opens up a new proxy buffer with ruby, python, perl, or lua code embedded in
+" vimscript.
+function! inline_edit#VimEmbeddedScript()
+  let start_pattern = '^\s*\(ruby\|python\|perl\|lua\)\s*<<\s*\(.*\)$'
+
+  if search(start_pattern, 'Wb') <= 0
+    return []
+  endif
+
+  let start        = line('.') + 1
+  let indent       = indent(line('.'))
+  let sub_filetype = substitute(getline('.'), start_pattern, '\1', '')
+  let delimiter    = substitute(getline('.'), start_pattern, '\2', '')
+
+  if len(delimiter) == 0
+    let delimiter = '.'
+  endif
+
+  if search('^\V'.delimiter.'\$', 'W') <= 0
+    return []
+  endif
+  let end = line('.') - 1
+
+  return [start, end, sub_filetype, indent]
+endfunction
