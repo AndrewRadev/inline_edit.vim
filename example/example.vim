@@ -10,6 +10,10 @@ PERL
   lua << LUA
   print("OK")
 LUA
+
+  mzscheme << MZSCHEME
+  (display "!!!")
+MZSCHEME
 endfunction
 
 function! Example()

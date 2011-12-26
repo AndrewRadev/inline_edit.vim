@@ -76,22 +76,34 @@ endfunction
 
 " function! inline_edit#VimEmbeddedScript() {{{2
 "
-" Opens up a new proxy buffer with ruby, python, perl, or lua code embedded in
-" vimscript.
+" Opens up a new proxy buffer with ruby, python, perl, lua or mzscheme code
+" embedded in vimscript.
 function! inline_edit#VimEmbeddedScript()
-  let start_pattern = '^\s*\(ruby\|python\|perl\|lua\)\s*<<\s*\(.*\)$'
+  let start_pattern = '^\s*\(\%(rub\|py\|pe\|mz\|lua\)\S*\)\s*<<\s*\(.*\)$'
 
   if search(start_pattern, 'Wb') <= 0
     return []
   endif
 
-  let start        = line('.') + 1
-  let indent       = indent(line('.'))
-  let sub_filetype = substitute(getline('.'), start_pattern, '\1', '')
-  let delimiter    = substitute(getline('.'), start_pattern, '\2', '')
+  let start     = line('.') + 1
+  let indent    = indent(line('.'))
+  let language  = substitute(getline('.'), start_pattern, '\1', '')
+  let delimiter = substitute(getline('.'), start_pattern, '\2', '')
 
   if len(delimiter) == 0
     let delimiter = '.'
+  endif
+
+  if language =~ '^rub'
+    let sub_filetype = 'ruby'
+  elseif language =~ '^py'
+    let sub_filetype = 'python'
+  elseif language =~ '^pe'
+    let sub_filetype = 'perl'
+  elseif language =~ '^mz'
+    let sub_filetype = 'scheme'
+  elseif language == 'lua'
+    let sub_filetype = 'lua'
   endif
 
   if search('^\V'.delimiter.'\$', 'W') <= 0
