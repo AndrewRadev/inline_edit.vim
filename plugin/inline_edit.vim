@@ -34,7 +34,7 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype':     'html\|eruby\|php',
+      \ 'main_filetype':     '*html',
       \ 'sub_filetype':      'javascript',
       \ 'indent_adjustment': 1,
       \ 'start':             '<script\>[^>]*>',
@@ -42,7 +42,7 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
-      \ 'main_filetype':     'html\|eruby\|php',
+      \ 'main_filetype':     '*html',
       \ 'sub_filetype':      'css',
       \ 'indent_adjustment': 1,
       \ 'start':             '<style\>[^>]*>',
@@ -62,8 +62,17 @@ function! s:InlineEdit(count, filetype)
     call s:VisualInlineEdit(a:filetype)
   else
     for entry in g:inline_edit_patterns
-      if has_key(entry, 'main_filetype') && &filetype !~ entry.main_filetype
-        continue
+      if has_key(entry, 'main_filetype')
+        if entry.main_filetype == '*html'
+          " treat "*html" as a special case
+          let pattern_filetype = 'html\|eruby\|php'
+        else
+          let pattern_filetype = entry.main_filetype
+        endif
+
+        if &filetype !~ pattern_filetype
+          continue
+        endif
       endif
 
       if has_key(entry, 'callback')

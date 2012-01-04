@@ -183,6 +183,13 @@ the margins of the area to edit. The other entries are as follows:
       example, "html\|eruby\|php" and have the related patterns work across
       those three filetypes.
 
+      Setting main_filetype to the string "*html" is a special case, since a
+      lot of filetypes are "html-like". This will match any such filetype that
+      I've managed to think of. If there's any I've missed (which is very
+      probable) and you'd like me to add them here for your convenience,
+      please open an issue on the github bugtracker (see |inline-edit-issues|
+      for the url).
+
     - sub_filetype:
 
       This is the new filetype to set to the proxy buffer. If it's omitted,
