@@ -123,7 +123,8 @@ Visual Mode ~
 
 If you'd like to work on an area that's not very well definable, |:InlineEdit|
 also works in visual mode. Selecting an area of the code and executing
-:InlineEdit will open up a proxy buffer with that area.
+":InlineEdit some_filetype" will open up a proxy buffer with that area and set
+the filetype to "some_filetype".
 
 
 ==============================================================================
