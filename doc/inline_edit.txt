@@ -219,7 +219,7 @@ to be a list of four values in this order:
 This is much more complicated, since the function needs to search for the area
 of interest itself and simply return its start and end. It's also more
 flexible, since it allows for dynamically changing targets. Take a look at the
-function inline_edit#MardkownFencedCode() in "autoload/inline_edit.vim" for
+function inline_edit#MarkdownFencedCode() in "autoload/inline_edit.vim" for
 inspiration.
 
 If the callback function fails to find the area, it should return an empty
