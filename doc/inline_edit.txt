@@ -4,7 +4,7 @@ CONTENTS                                      *inline-edit* *inline-edit-content
     Installation...........................: |inline-edit-installation|
     Usage..................................: |inline-edit-usage|
     Settings...............................: |inline-edit-settings|
-    Internals..............................: |inline-edit-internals|
+    Extending..............................: |inline-edit-extending|
     Issues.................................: |inline-edit-issues|
 
 
@@ -149,18 +149,24 @@ EXTENDING                                                *inline-edit-extending*
 
 The variable |g:inline_edit_patterns| is a list of dictionaries. Extending the
 plugin to work for new patterns is a simple matter of adding entries to it.
-Each entry in the list can have one of two formats.
+You can safely assign patterns to the variable in your .vimrc, the plugin
+won't override them.
 
+Each entry in the list can have one of two formats.
 
 Simple ~
 >
-    call add(g:inline_edit_patterns, {
-        \ 'main_filetype':     'vim',
-        \ 'sub_filetype':      'vim',
-        \ 'indent_adjustment': 1,
-        \ 'start':             '\<function\>',    " required
-        \ 'end':               '\<endfunction\>', " required
-        \ })
+    let g:inline_edit_patterns = [
+            \   {
+            \     'main_filetype':     'vim',
+            \     'sub_filetype':      'vim',
+            \     'indent_adjustment': 1,
+            \     'start':             '\<function\>',    " required
+            \     'end':               '\<endfunction\>', " required
+            \   },
+            \
+            \   " ...
+            \ ]
 <
 The dictionary can contain several items, but the only two required ones are
 "start" and "end". They should be regular expressions that are used to find
@@ -191,12 +197,15 @@ the margins of the area to edit. The other entries are as follows:
 
 
 Callback ~
-
 >
-    call add(g:inline_edit_patterns, {
-        \ 'main_filetype': 'textile',
-        \ 'callback':      'InlineEditTextileBuffer',
-        \ })
+    let g:inline_edit_patterns = [
+            \   {
+            \     'main_filetype': 'textile',
+            \     'callback':      'InlineEditTextileBuffer',
+            \   },
+            \
+            \   " ...
+            \ ]
 <
 If the dictionary contains a "callback" key, its value will be assumed to be a
 function and will be called as a function with no parameters. The result needs
