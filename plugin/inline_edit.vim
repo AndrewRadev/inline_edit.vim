@@ -14,6 +14,10 @@ if !exists('g:inline_edit_autowrite')
   let g:inline_edit_autowrite = 0
 endif
 
+if !exists('g:inline_edit_html_like_filetypes')
+  let g:inline_edit_html_like_filetypes = []
+endif
+
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
@@ -65,7 +69,8 @@ function! s:InlineEdit(count, filetype)
       if has_key(entry, 'main_filetype')
         if entry.main_filetype == '*html'
           " treat "*html" as a special case
-          let pattern_filetype = 'html\|eruby\|php'
+          let filetypes = ['html', 'eruby', 'php'] + g:inline_edit_html_like_filetypes
+          let pattern_filetype = join(filetypes, '\|')
         else
           let pattern_filetype = entry.main_filetype
         endif

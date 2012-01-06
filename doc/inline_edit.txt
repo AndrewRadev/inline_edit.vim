@@ -143,6 +143,21 @@ If this variable is set to 1, writing the temporary proxy buffer would also
 write the original buffer to its file. If it's 0, the original buffer will be
 modified, but not saved.
 
+                                                 *b:inline_edit_html_like_filetypes*
+>
+    let b:inline_edit_html_like_filetypes = ['coldfusion', 'mako']
+<
+
+Default value: []
+
+This variable should contain additional filetypes to use for the special
+"*html" filetype pattern (:help |inline-edit-extending|). Setting a list of
+filetypes here will make the plugin detect "<script>" and "<style>" tags in
+those as well.
+
+The reason for this is to be able to extend the plugin easier in this specific
+case (editing an html-like filetype).
+
 
 ==============================================================================
 EXTENDING                                                *inline-edit-extending*
@@ -185,10 +200,10 @@ the margins of the area to edit. The other entries are as follows:
 
       Setting main_filetype to the string "*html" is a special case, since a
       lot of filetypes are "html-like". This will match any such filetype that
-      I've managed to think of. If there's any I've missed (which is very
-      probable) and you'd like me to add them here for your convenience,
-      please open an issue on the github bugtracker (see |inline-edit-issues|
-      for the url).
+      I've managed to think of. To extend this pattern to any ones that I've
+      missed, you can set the variable |g:inline_edit_html_like_filetypes| to
+      a list of those additional filetypes. See |inline-edit-settings| for
+      details.
 
     - sub_filetype:
 
