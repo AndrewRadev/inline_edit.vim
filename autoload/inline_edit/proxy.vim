@@ -7,7 +7,6 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
         \ 'end':             a:end_line,
         \ 'indent':          (&et ? a:indent : a:indent / &ts),
         \
-        \ 'Init':                 function('inline_edit#proxy#Init'),
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer'),
         \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
@@ -43,9 +42,6 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
   autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
 
   return proxy
-endfunction
-
-function! inline_edit#proxy#Init(start_line, end_line, filetype, indent) dict
 endfunction
 
 " This function updates the original buffer with the contents of the proxy
