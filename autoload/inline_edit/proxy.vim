@@ -68,7 +68,9 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   call inline_edit#PushCursor()
   call cursor(self.start, 1)
-  exe self.start . ',' . self.end . 'delete _'
+  if self.end - self.start >= 0
+    exe self.start . ',' . self.end . 'delete _'
+  endif
   call append(self.start - 1, new_lines)
   if g:inline_edit_autowrite
     write
