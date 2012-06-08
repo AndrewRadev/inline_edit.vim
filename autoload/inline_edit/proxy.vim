@@ -26,9 +26,19 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
 
   " Create proxy buffer
   exe 'silent split ' . tempname()
+  let is_ro = &readonly
+  if is_ro
+    " If the original_buffer is RO, creating and modifying the proxy_buffer will
+    " generate warnings.  Temporarily clear the RO flag.
+    set noreadonly
+  endif
   call append(0, lines)
   $delete _
   write
+  if is_ro
+    " restore RO state to match original_buffer.
+    set readonly
+  endif
   set foldlevel=99
   let proxy.proxy_buffer = bufnr('%')
   call s:SetupBuffer(proxy)
