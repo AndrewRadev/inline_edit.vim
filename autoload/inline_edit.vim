@@ -113,3 +113,66 @@ function! inline_edit#VimEmbeddedScript()
 
   return [start, end, sub_filetype, indent]
 endfunction
+
+
+" function! inline_edit#HereDoc() {{{2
+"
+" Opens up a new proxy buffer with the contents of a shell script here
+" document.
+function! inline_edit#HereDoc()
+	" The beginning of a 'here doc' could be variations on any of these
+	" forms:
+	"   <<- "EOF"
+	"   << 'ABC'
+	"   <<WXYZ
+	"   cat <<-EOF > newfile
+	let start_pattern = '<<-\?\s*\(["'']\?\)\(\S*\)\1'
+
+	call inline_edit#PushCursor()
+
+	" find the start of the inline area,
+	" first on the current line, then on any previous lines
+	if search(start_pattern, 'Wc', line('.')) <= 0
+		if search(start_pattern, 'Wcb') <= 0
+			" pattern not found
+			call inline_edit#PopCursor()
+			return []
+		endif
+	endif
+
+	let start = line('.') + 1
+
+	" define the end_pattern based on the token found in start_pattern
+	let end_pattern = '^\s*' . matchlist(getline('.'), start_pattern)[2]
+
+	" This should allow the command to run on the opening << EOF line,
+	" in the middle of the heredoc, or on the closing EOF line.
+	"
+	" Go to the cursor's original position before searching for
+	" end_pattern, but not the line indicating the start of the here doc,
+	" otherwise the ending token might be matched on the opening line.
+	call inline_edit#PopCursor()
+	call inline_edit#PushCursor()
+	" if the start of the new document is after the current line, then move
+	" down one, otherwise stay put.
+	if line('.') < start
+		normal <Down>
+	endif
+
+	" find the end of the inline area
+	if search(end_pattern, 'Wc') <= 0
+		"pattern not found
+		call inline_edit#PopCursor()
+		return []
+	endif
+	let end = line('.') - 1
+
+	call inline_edit#PopCursor()
+
+	" automatic filetype detection
+	let filetype = ''
+	let indent = indent(start)
+
+	return [start, end, filetype, indent]
+endfunction
+

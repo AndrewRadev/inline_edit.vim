@@ -30,6 +30,11 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'sh',
+      \ 'callback':      'inline_edit#HereDoc'
+      \ })
+
+call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'ruby',
       \ 'sub_filetype':      'sql',
       \ 'indent_adjustment': 1,
