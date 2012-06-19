@@ -41,6 +41,14 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
   endif
   set foldlevel=99
   let proxy.proxy_buffer = bufnr('%')
+
+  if proxy.filetype == ''
+    " if filetype is unspecified, let vim attempt autodetection based on content
+    filetype detect
+    let proxy.filetype = &filetype
+  endif
+  let &filetype = proxy.filetype
+
   call s:SetupBuffer(proxy)
 
   " Position cursor correctly
@@ -127,7 +135,6 @@ endfunction
 
 function! s:SetupBuffer(proxy)
   let b:proxy   = a:proxy
-  let &filetype = b:proxy.filetype
 
   let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
   if &statusline =~ '%[fF]'
