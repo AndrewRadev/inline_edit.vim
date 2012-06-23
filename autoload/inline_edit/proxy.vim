@@ -34,7 +34,8 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
   endif
   call append(0, lines)
   $delete _
-  write
+  " simulate a 'write'
+  setlocal nomodified
   if is_ro
     " restore RO state to match original_buffer.
     set readonly
@@ -57,7 +58,8 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
   call setpos('.', position)
 
   " On writing proxy buffer, update original one
-  autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
+  setlocal buftype=acwrite
+  autocmd BufWriteCmd <buffer> silent call b:proxy.UpdateOriginalBuffer()
 
   return proxy
 endfunction
@@ -95,6 +97,8 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   endif
   call inline_edit#PopCursor()
   exe 'buffer ' . self.proxy_buffer
+  " simulate a 'write'
+  setlocal nomodified
 
   " Keep the difference in lines to know how to update the other proxies if
   " necessary.
@@ -136,9 +140,11 @@ endfunction
 function! s:SetupBuffer(proxy)
   let b:proxy = a:proxy
 
-  let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
-  if &statusline =~ '%[fF]'
-    let statusline = substitute(&statusline, '%[fF]', statusline, '')
-  endif
-  exe "setlocal statusline=" . escape(statusline, ' |')
+  " give the buffer a meaningful name in a way that won't clobber the
+  " 'statusline' and is also compatible for use with the 'ruler'
+  let filename = printf('[%s:%d-%d]',
+	\ bufname(b:proxy.original_buffer),
+	\ b:proxy.start,
+	\ b:proxy.end)
+  silent exec "keepalt file " . filename
 endfunction
