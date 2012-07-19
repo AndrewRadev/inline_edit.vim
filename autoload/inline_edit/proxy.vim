@@ -135,7 +135,9 @@ endfunction
 
 function! s:SetupBuffer(proxy)
   let b:proxy = a:proxy
+  let &filetype = a:proxy.filetype
 
+  " TODO don't clobber the statusline after saving
   let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(b:proxy.original_buffer))
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
