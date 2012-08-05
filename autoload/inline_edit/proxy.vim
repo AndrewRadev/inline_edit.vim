@@ -11,50 +11,11 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
         \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
 
-  " Store all proxy buffers in the original one
-  if !exists('b:proxy_buffers')
-    let b:proxy_buffers = []
-  endif
-  call add(b:proxy_buffers, proxy)
-
-  " Collect data from original buffer
-  let lines = []
-  for line in getbufline(proxy.original_buffer, proxy.start, proxy.end)
-    call add(lines, substitute(line, '^\s\{'.proxy.indent.'}', '', ''))
-  endfor
-  let position = getpos('.')
-
-  " Create proxy buffer
-  exe 'silent split ' . tempname()
-  let is_ro = &readonly
-  if is_ro
-    " If the original_buffer is RO, creating and modifying the proxy_buffer will
-    " generate warnings.  Temporarily clear the RO flag.
-    set noreadonly
-  endif
-  call append(0, lines)
-  $delete _
-  write
-  if is_ro
-    " restore RO state to match original_buffer.
-    set readonly
-  endif
-  set foldlevel=99
-  let proxy.proxy_buffer = bufnr('%')
-
-  if proxy.filetype == ''
-    " if filetype is unspecified, let vim attempt autodetection based on content
-    filetype detect
-    let proxy.filetype = &filetype
-  endif
-  let &filetype = proxy.filetype
-
-  call s:SetupBuffer(proxy)
-
-  " Position cursor correctly
-  let position[0] = bufnr(proxy.proxy_buffer)
-  let position[1] = position[1] - proxy.start + 1
-  call setpos('.', position)
+  call s:StoreProxy(proxy)
+  let [lines, position] = s:LoadContents(proxy)
+  call s:CreateBuffer(proxy, lines)
+  call s:UpdateBuffer(proxy)
+  call s:PositionCursor(proxy, position)
 
   " On writing proxy buffer, update original one
   autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
@@ -102,7 +63,7 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   let new_line_count = len(new_lines)
 
   let self.end = self.start + new_line_count - 1
-  call s:SetupBuffer(self)
+  call s:UpdateBuffer(self)
 
   call inline_edit#PopCursor() " in proxy buffer
 
@@ -133,7 +94,55 @@ function! inline_edit#proxy#UpdateOtherProxies(delta) dict
   endfor
 endfunction
 
-function! s:SetupBuffer(proxy)
+" Store all proxy buffers in the original one
+function! s:StoreProxy(proxy)
+  if !exists('b:proxy_buffers')
+    let b:proxy_buffers = []
+  endif
+  call add(b:proxy_buffers, a:proxy)
+endfunction
+
+" Collect data from original buffer
+function! s:LoadContents(proxy)
+  let proxy    = a:proxy
+  let position = getpos('.')
+  let lines    = []
+
+  for line in getbufline(proxy.original_buffer, proxy.start, proxy.end)
+    call add(lines, substitute(line, '^\s\{'.proxy.indent.'}', '', ''))
+  endfor
+
+  return [lines, position]
+endfunction
+
+" Create proxy buffer
+function! s:CreateBuffer(proxy, lines)
+  let proxy = a:proxy
+  let lines = a:lines
+
+  exe 'silent split ' . tempname()
+
+  " avoid warnings
+  let saved_readonly = &readonly
+  let &readonly = 0
+
+  call append(0, lines)
+  $delete _
+  write
+  set foldlevel=99
+  let proxy.proxy_buffer = bufnr('%')
+
+  let &readonly = saved_readonly
+
+  if proxy.filetype == ''
+    " attempt autodetection
+    filetype detect
+    let proxy.filetype = &filetype
+  endif
+  let &filetype = proxy.filetype
+endfunction
+
+function! s:UpdateBuffer(proxy)
   let b:proxy = a:proxy
   let &filetype = a:proxy.filetype
 
@@ -143,4 +152,14 @@ function! s:SetupBuffer(proxy)
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
   endif
   exe "setlocal statusline=" . escape(statusline, ' |')
+endfunction
+
+" Position cursor correctly
+function! s:PositionCursor(proxy, position)
+  let proxy       = a:proxy
+  let position    = a:position
+  let position[0] = bufnr(proxy.proxy_buffer)
+  let position[1] = position[1] - proxy.start + 1
+
+  call setpos('.', position)
 endfunction
