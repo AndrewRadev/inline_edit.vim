@@ -1,5 +1,6 @@
-function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
+function! inline_edit#proxy#New(controller, start_line, end_line, filetype, indent)
   let proxy = {
+        \ 'controller':      a:controller,
         \ 'original_buffer': bufnr('%'),
         \ 'proxy_buffer':    -1,
         \ 'filetype':        a:filetype,
@@ -11,7 +12,6 @@ function! inline_edit#proxy#New(start_line, end_line, filetype, indent)
         \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
         \ }
 
-  call s:StoreProxy(proxy)
   let [lines, position] = s:LoadContents(proxy)
   call s:CreateBuffer(proxy, lines)
   call s:UpdateBuffer(proxy)
@@ -67,39 +67,7 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   call inline_edit#PopCursor() " in proxy buffer
 
-  call self.UpdateOtherProxies(new_line_count - line_count)
-endfunction
-
-" If any of the other proxies are located below this one, we need to update
-" their starting and ending lines, since any change would result in a line
-" shift.
-"
-" a:delta is the change in the number of lines.
-function! inline_edit#proxy#UpdateOtherProxies(delta) dict
-  if a:delta == 0
-    return
-  endif
-
-  " Iterate through all proxies by asking the original buffer for the list
-  for other in getbufvar(self.original_buffer, 'proxy_buffers')
-    if other == self
-      continue
-    endif
-
-    if self.original_buffer == other.original_buffer
-          \ && self.end <= other.start
-      let other.start = other.start + a:delta
-      let other.end   = other.end   + a:delta
-    endif
-  endfor
-endfunction
-
-" Store all proxy buffers in the original one
-function! s:StoreProxy(proxy)
-  if !exists('b:proxy_buffers')
-    let b:proxy_buffers = []
-  endif
-  call add(b:proxy_buffers, a:proxy)
+  call self.controller.SyncProxies(self, new_line_count - line_count)
 endfunction
 
 " Collect data from original buffer
