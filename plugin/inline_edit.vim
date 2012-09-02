@@ -18,6 +18,14 @@ if !exists('g:inline_edit_html_like_filetypes')
   let g:inline_edit_html_like_filetypes = []
 endif
 
+if !exists('g:inline_edit_proxy_type')
+  let g:inline_edit_proxy_type = 'scratch'
+endif
+
+if index(['scratch', 'tempfile'], g:inline_edit_proxy_type) < 0
+  echoerr 'Inline Edit: Proxy type can''t be "'.g:inline_edit_proxy_type.'". Needs to be one of: scratch, tempfile'
+endif
+
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
