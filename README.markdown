@@ -30,24 +30,24 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
 
 - Javascript and CSS within HTML
 
-``` html
-<head>
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#foo').click(function() {
-        alert('OK');
-      });
-    })
-  </script>
+  ``` html
+  <head>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#foo').click(function() {
+          alert('OK');
+        });
+      })
+    </script>
 
-  <style>
-    body {
-      color: blue;
-      background-color: red;
-    }
-  </style>
-</head>
-```
+    <style>
+      body {
+        color: blue;
+        background-color: red;
+      }
+    </style>
+  </head>
+  ```
 
 - SQL within ruby (matches "<<-SQL")
 
@@ -61,26 +61,26 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
 
 - Code within fenced markdown blocks
 
-<pre>
-  Some text.
+  <pre>
+    Some text.
 
-  ``` ruby
-  def foo
-    puts "OK"
-  end
-  ```
+    ``` ruby
+    def foo
+      puts "OK"
+    end
+    ```
 
-  ``` python
-  def foo():
-      print("OK")
-  ```
+    ``` python
+    def foo():
+        print("OK")
+    ```
 
-  Some other text.
-</pre>
+    Some other text.
+  </pre>
 
 - Django blocks in templates (Thanks to [@Vladimiroff](https://github.com/Vladimiroff))
 
-``` htmldjango
+  ``` htmldjango
   {%  block content %}
   <h1>{{ section.title }}</h1>
 
@@ -93,6 +93,22 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
   <p>{{ story.tease|truncatewords:"100" }}</p>
   {% endfor %}
   {% endblock %}
-```
+  ```
+
+- Heredocs in shellscript (Thanks to [@fewaffles](https://github.com/fewaffles))
+
+  ```
+  cat <<-RUBY
+    #! /usr/bin/env ruby
+
+    puts "OK"
+  RUBY
+
+  cat <<PYTHON
+    #! /usr/bin/env python3
+
+    print("OK")
+  PYTHON
+  ```
 
 - Visual mode - any area that you mark
