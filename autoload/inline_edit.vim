@@ -18,7 +18,7 @@ function! inline_edit#PushCursor()
     let b:cursor_position_stack = []
   endif
 
-  call add(b:cursor_position_stack, getpos('.'))
+  call add(b:cursor_position_stack, winsaveview())
 endfunction
 
 " function! inline_edit#PopCursor() {{{2
@@ -30,7 +30,7 @@ function! inline_edit#PopCursor()
     let b:cursor_position_stack = []
   endif
 
-  call setpos('.', remove(b:cursor_position_stack, -1))
+  call winrestview(remove(b:cursor_position_stack, -1))
 endfunction
 
 " function! inline_edit#PeekCursor() {{{2
