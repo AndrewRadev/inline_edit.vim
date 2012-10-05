@@ -1,7 +1,7 @@
 function! inline_edit#proxy#New(controller, start_line, end_line, filetype, indent)
   let proxy = {
         \ 'controller':      a:controller,
-        \ 'original_buffer': bufnr('%'),
+        \ 'original_buffer': expand('%:p'),
         \ 'proxy_buffer':    -1,
         \ 'filetype':        a:filetype,
         \ 'start':           a:start_line,
@@ -49,7 +49,12 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   " Switch to the original buffer, delete the relevant lines, add the new
   " ones, switch back to the diff buffer.
   setlocal nomodified
-  exe 'buffer ' . self.original_buffer
+  let original_bufnr = bufnr(self.original_buffer)
+  if original_bufnr < 0 " no buffer found
+    call inline_edit#PopCursor()
+    return
+  endif
+  exe 'buffer ' . original_bufnr
 
   call inline_edit#PushCursor()
   call cursor(self.start, 1)
@@ -108,8 +113,8 @@ function! s:CreateProxyBuffer(proxy, lines)
     $delete _
     set nomodified
 
-    let original_bufname = bufname(proxy.original_buffer)
-    let filename = printf('[%s:%d-%d]', original_bufname, proxy.start, proxy.end)
+    let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
+    let filename = printf('[%s:%d-%d]', short_filename, proxy.start, proxy.end)
     silent exec 'keepalt file ' . filename
   elseif g:inline_edit_proxy_type == 'tempfile'
     exe 'silent split ' . tempname()
@@ -145,7 +150,8 @@ function! s:SetStatusline(proxy)
     return
   endif
 
-  let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', bufname(a:proxy.original_buffer))
+  let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
+  let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', short_filename)
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
   endif
