@@ -48,6 +48,9 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   " Switch to the original buffer, delete the relevant lines, add the new
   " ones, switch back to the diff buffer.
+  let saved_bufhidden = &bufhidden
+  let &bufhidden = 'hide'
+
   setlocal nomodified
   let original_bufnr = bufnr(self.original_buffer)
   if original_bufnr < 0 " no buffer found
@@ -67,6 +70,8 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   endif
   call inline_edit#PopCursor()
   exe 'buffer ' . self.proxy_buffer
+
+  let &bufhidden = saved_bufhidden
 
   " Keep the difference in lines to know how to update the other proxies if
   " necessary.
@@ -108,7 +113,7 @@ function! s:CreateProxyBuffer(proxy, lines)
   if g:inline_edit_proxy_type == 'scratch'
     exe 'silent new'
     setlocal buftype=acwrite
-    setlocal bufhidden=hide
+    setlocal bufhidden=wipe
     call append(0, lines)
     $delete _
     set nomodified
