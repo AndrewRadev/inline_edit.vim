@@ -120,7 +120,7 @@ function! s:CreateProxyBuffer(proxy, lines)
 
     let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
     let filename = printf('[%s:%d-%d]', short_filename, proxy.start, proxy.end)
-    silent exec 'keepalt file ' . filename
+    silent exec 'keepalt file ' . escape(filename, '[')
   elseif g:inline_edit_proxy_type == 'tempfile'
     exe 'silent split ' . tempname()
     call append(0, lines)
