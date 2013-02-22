@@ -41,7 +41,12 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   let new_lines = []
   for line in getbufline('%', 0, '$')
-    call add(new_lines, leading_whitespace.line)
+    if line =~ '^$'
+      " blank line, no need for whitespace
+    else
+      let line = leading_whitespace.line
+    endif
+    call add(new_lines, line)
   endfor
 
   call inline_edit#PushCursor() " in proxy buffer
