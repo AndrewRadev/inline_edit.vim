@@ -84,21 +84,9 @@ function! s:InlineEdit(count, filetype)
     " then an area has been marked in visual mode
     call controller.VisualEdit(a:filetype)
   else
-    for entry in g:inline_edit_patterns
-      if has_key(entry, 'main_filetype')
-        if entry.main_filetype == '*html'
-          " treat "*html" as a special case
-          let filetypes = ['html', 'eruby', 'php', 'eco'] + g:inline_edit_html_like_filetypes
-          let pattern_filetype = join(filetypes, '\|')
-        else
-          let pattern_filetype = entry.main_filetype
-        endif
+    let relevant_patterns = s:PatternsForFiletype(&filetype)
 
-        if &filetype !~ pattern_filetype
-          continue
-        endif
-      endif
-
+    for entry in relevant_patterns
       if has_key(entry, 'callback')
         let result = call(entry.callback, [])
 
@@ -111,4 +99,28 @@ function! s:InlineEdit(count, filetype)
       endif
     endfor
   endif
+endfunction
+
+function! s:PatternsForFiletype(filetype)
+  let patterns = []
+
+  for entry in g:inline_edit_patterns
+    if has_key(entry, 'main_filetype')
+      if entry.main_filetype == '*html'
+        " treat "*html" as a special case
+        let filetypes = ['html', 'eruby', 'php', 'eco'] + g:inline_edit_html_like_filetypes
+        let regex = join(filetypes, '\|')
+      else
+        let regex = entry.main_filetype
+      endif
+
+      if a:filetype !~ regex
+        continue
+      endif
+    endif
+
+    call add(patterns, entry)
+  endfor
+
+  return patterns
 endfunction
