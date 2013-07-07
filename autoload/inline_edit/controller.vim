@@ -2,10 +2,12 @@ function! inline_edit#controller#New()
   let controller = {
         \ 'proxies': [],
         \
-        \ 'NewProxy':    function('inline_edit#controller#NewProxy'),
-        \ 'SyncProxies': function('inline_edit#controller#SyncProxies'),
-        \ 'VisualEdit':  function('inline_edit#controller#VisualEdit'),
-        \ 'PatternEdit': function('inline_edit#controller#PatternEdit'),
+        \ 'NewProxy':     function('inline_edit#controller#NewProxy'),
+        \ 'SyncProxies':  function('inline_edit#controller#SyncProxies'),
+        \ 'VisualEdit':   function('inline_edit#controller#VisualEdit'),
+        \ 'PatternEdit':  function('inline_edit#controller#PatternEdit'),
+        \ 'CallbackEdit': function('inline_edit#controller#CallbackEdit'),
+        \ 'Edit':         function('inline_edit#controller#Edit'),
         \ }
 
   return controller
@@ -81,4 +83,25 @@ function! inline_edit#controller#PatternEdit(pattern) dict
 
   call self.NewProxy(start, end, pattern.sub_filetype, indent)
   return 1
+endfunction
+
+function! inline_edit#controller#CallbackEdit(pattern) dict
+  let result = call(a:pattern.callback, [])
+
+  if !empty(result)
+    call call(self.NewProxy, result, self)
+    return 1
+  endif
+
+  return 0
+endfunction
+
+function! inline_edit#controller#Edit(pattern) dict
+  if has_key(a:pattern, 'callback')
+    if self.CallbackEdit(a:pattern)
+      return
+    endif
+  elseif self.PatternEdit(a:pattern)
+    return
+  endif
 endfunction

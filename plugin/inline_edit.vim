@@ -29,11 +29,13 @@ endif
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
+      \ 'start':         '^\s*```\s*\(.\+\)',
       \ 'callback':      'inline_edit#MarkdownFencedCode',
       \ })
 
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'vim',
+      \ 'start':         '^\s*\(\%(rub\|py\|pe\|mz\|lua\)\S*\)\s*<<\s*\(.*\)$',
       \ 'callback':      'inline_edit#VimEmbeddedScript'
       \ })
 
@@ -87,14 +89,7 @@ function! s:InlineEdit(count, filetype)
     let relevant_patterns = s:PatternsForFiletype(&filetype)
 
     for entry in relevant_patterns
-      if has_key(entry, 'callback')
-        let result = call(entry.callback, [])
-
-        if !empty(result)
-          call call(controller.NewProxy, result, controller)
-          return
-        endif
-      elseif controller.PatternEdit(entry)
+      if controller.Edit(entry)
         return
       endif
     endfor
@@ -103,8 +98,8 @@ function! s:InlineEdit(count, filetype)
     let saved_cursor = winsaveview()
 
     for entry in relevant_patterns
-      if !has_key(entry, 'start') || !has_key(entry, 'end')
-        " it's not a start-end pattern, we can't find it
+      if !has_key(entry, 'start')
+        " there's no "start" pattern to look for
         continue
       end
 
@@ -112,12 +107,12 @@ function! s:InlineEdit(count, filetype)
 
       " special case: beginning of file
       call search(entry.start. 'Wc')
-      if controller.PatternEdit(entry)
+      if controller.Edit(entry)
         return
       endif
 
       while search(entry.start, 'We') > 0
-        if controller.PatternEdit(entry)
+        if controller.Edit(entry)
           return
         endif
       endwhile
