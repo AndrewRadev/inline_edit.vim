@@ -98,6 +98,32 @@ function! s:InlineEdit(count, filetype)
         return
       endif
     endfor
+
+    " Nothing found, try to locate a pattern in the buffer
+    let saved_cursor = winsaveview()
+
+    for entry in relevant_patterns
+      if !has_key(entry, 'start') || !has_key(entry, 'end')
+        " it's not a start-end pattern, we can't find it
+        continue
+      end
+
+      call cursor(1, 1)
+
+      " special case: beginning of file
+      call search(entry.start. 'Wc')
+      if controller.PatternEdit(entry)
+        return
+      endif
+
+      while search(entry.start, 'We') > 0
+        if controller.PatternEdit(entry)
+          return
+        endif
+      endwhile
+    endfor
+
+    call winrestview(saved_cursor)
   endif
 endfunction
 
