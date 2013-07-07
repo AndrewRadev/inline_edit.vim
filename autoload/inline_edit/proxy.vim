@@ -8,8 +8,7 @@ function! inline_edit#proxy#New(controller, start_line, end_line, filetype, inde
         \ 'end':             a:end_line,
         \ 'indent':          (&et ? a:indent : a:indent / &ts),
         \
-        \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer'),
-        \ 'UpdateOtherProxies':   function('inline_edit#proxy#UpdateOtherProxies'),
+        \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer')
         \ }
 
   let [lines, position] = s:LoadOriginalBufferContents(proxy)
