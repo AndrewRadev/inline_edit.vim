@@ -2,12 +2,15 @@ function! inline_edit#controller#New()
   let controller = {
         \ 'proxies': [],
         \
-        \ 'NewProxy':     function('inline_edit#controller#NewProxy'),
-        \ 'SyncProxies':  function('inline_edit#controller#SyncProxies'),
-        \ 'VisualEdit':   function('inline_edit#controller#VisualEdit'),
-        \ 'PatternEdit':  function('inline_edit#controller#PatternEdit'),
-        \ 'CallbackEdit': function('inline_edit#controller#CallbackEdit'),
-        \ 'Edit':         function('inline_edit#controller#Edit'),
+        \ 'NewProxy':            function('inline_edit#controller#NewProxy'),
+        \ 'SyncProxies':         function('inline_edit#controller#SyncProxies'),
+        \ 'VisualEdit':          function('inline_edit#controller#VisualEdit'),
+        \ 'PatternEdit':         function('inline_edit#controller#PatternEdit'),
+        \ 'CallbackEdit':        function('inline_edit#controller#CallbackEdit'),
+        \ 'Edit':                function('inline_edit#controller#Edit'),
+        \ 'PreparePatternEdit':  function('inline_edit#controller#PreparePatternEdit'),
+        \ 'PrepareCallbackEdit': function('inline_edit#controller#PrepareCallbackEdit'),
+        \ 'PrepareEdit':         function('inline_edit#controller#PrepareEdit'),
         \ }
 
   return controller
@@ -56,7 +59,8 @@ function! inline_edit#controller#VisualEdit(filetype) dict
   call self.NewProxy(start, end, filetype, indent)
 endfunction
 
-function! inline_edit#controller#PatternEdit(pattern) dict
+" Tries to locate the necessary points of reference for a pattern edit.
+function! inline_edit#controller#PreparePatternEdit(pattern) dict
   let pattern = extend({
         \ 'sub_filetype':      &filetype,
         \ 'indent_adjustment': 0,
@@ -67,26 +71,37 @@ function! inline_edit#controller#PatternEdit(pattern) dict
   " find start of area
   if searchpair(pattern.start, '', pattern.end, 'Wb') <= 0
     call inline_edit#PopCursor()
-    return 0
+    return []
   endif
   let start = line('.') + 1
 
   " find end of area
   if searchpair(pattern.start, '', pattern.end, 'W') <= 0
     call inline_edit#PopCursor()
-    return 0
+    return []
   endif
   let end    = line('.') - 1
   let indent = indent(line('.')) + pattern.indent_adjustment * (&et ? &sw : &ts)
 
   call inline_edit#PopCursor()
 
-  call self.NewProxy(start, end, pattern.sub_filetype, indent)
-  return 1
+  return [start, end, pattern.sub_filetype, indent]
+endfunction
+
+function! inline_edit#controller#PatternEdit(pattern) dict
+  let edit_attempt = self.PreparePatternEdit(a:pattern)
+
+  if empty(edit_attempt)
+    return 0
+  else
+    let [start, end, filetype, indent] = edit_attempt
+    call self.NewProxy(start, end, filetype, indent)
+    return 1
+  endif
 endfunction
 
 function! inline_edit#controller#CallbackEdit(pattern) dict
-  let result = call(a:pattern.callback, [])
+  let result = self.PrepareCallbackEdit(a:pattern)
 
   if !empty(result)
     call call(self.NewProxy, result, self)
@@ -94,6 +109,18 @@ function! inline_edit#controller#CallbackEdit(pattern) dict
   endif
 
   return 0
+endfunction
+
+function! inline_edit#controller#PrepareCallbackEdit(pattern) dict
+  return call(a:pattern.callback, [])
+endfunction
+
+function! inline_edit#controller#PrepareEdit(pattern) dict
+  if has_key(a:pattern, 'callback')
+    return self.PrepareCallbackEdit(a:pattern)
+  else
+    return self.PreparePatternEdit(a:pattern)
+  endif
 endfunction
 
 function! inline_edit#controller#Edit(pattern) dict
