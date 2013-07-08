@@ -96,30 +96,10 @@ function! s:InlineEdit(count, filetype)
     endfor
 
     " Nothing found, try to locate a pattern in the buffer
-    let saved_cursor = winsaveview()
-
-    for entry in relevant_patterns
-      if !has_key(entry, 'start')
-        " there's no "start" pattern to look for
-        continue
-      end
-
-      call cursor(1, 1)
-
-      " special case: beginning of file
-      call search(entry.start. 'Wc')
-      if controller.Edit(entry)
-        return
-      endif
-
-      while search(entry.start, 'We') > 0
-        if controller.Edit(entry)
-          return
-        endif
-      endwhile
-    endfor
-
-    call winrestview(saved_cursor)
+    let pattern = s:AutoLocate(controller, relevant_patterns)
+    if !empty(pattern)
+      call controller.Edit(pattern)
+    endif
   endif
 endfunction
 
@@ -145,4 +125,61 @@ function! s:PatternsForFiletype(filetype)
   endfor
 
   return patterns
+endfunction
+
+function! s:AutoLocate(controller, patterns)
+  let current_line  = line('.')
+  let saved_cursor  = winsaveview()
+  let found_entries = {}
+
+  for entry in a:patterns
+    if !has_key(entry, 'start')
+      " there's no "start" pattern to look for
+      continue
+    end
+
+    call cursor(1, 1)
+
+    " special case: beginning of file
+    call search(entry.start. 'Wc')
+    let found = a:controller.PrepareEdit(entry)
+    if !empty(found)
+      let [start, end, _f, _i] = found
+      " attempt to locate based on both start and end lines.
+      let found_entries[start] = entry
+      let found_entries[end]   = entry
+    endif
+
+    while search(entry.start, 'We') > 0
+      let found = a:controller.PrepareEdit(entry)
+      if !empty(found)
+        let [start, end, _f, _i] = found
+        " attempt to locate based on both start and end lines.
+        let found_entries[start] = entry
+        let found_entries[end]   = entry
+      endif
+    endwhile
+  endfor
+
+  if !empty(found_entries)
+    let found_lines  = map(keys(found_entries), 'str2nr(v:val)')
+    let closest_line = found_lines[0]
+    let min_distance = abs(closest_line - current_line)
+
+    for line in found_lines
+      if abs(line - current_line) < min_distance
+        let closest_line = line
+        let min_distance = abs(line - current_line)
+      endif
+    endfor
+
+    " position in a nice place to trigger the edit
+    exe closest_line
+    normal! $
+
+    return found_entries[closest_line]
+  endif
+
+  call winrestview(saved_cursor)
+  return {}
 endfunction
