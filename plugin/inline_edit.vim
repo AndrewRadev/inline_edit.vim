@@ -48,6 +48,7 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \ 'start':         '<<-\?\s*\(["'']\?\)\(\S*\)\1',
       \ 'main_filetype': 'sh\|ruby\|perl',
       \ 'callback':      'inline_edit#HereDoc'
       \ })
