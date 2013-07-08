@@ -47,6 +47,8 @@ endfunction
 "
 " Opens up a new proxy buffer with the contents of a fenced code block in
 " github-flavoured markdown.
+"
+" TODO (2013-07-08) Bug: matches end pattern first, breaks
 function! inline_edit#MarkdownFencedCode()
   let start_pattern = '^\s*```\s*\(.\+\)'
   let end_pattern   = '^\s*```\s*$'
