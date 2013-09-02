@@ -1,3 +1,5 @@
+*inline_edit.txt*	Edit code, embedded in other code, through a temporary buffer
+
 ==============================================================================
 CONTENTS                                      *inline-edit* *inline-edit-contents*
 
