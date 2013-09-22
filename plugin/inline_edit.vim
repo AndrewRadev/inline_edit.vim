@@ -112,3 +112,6 @@ function! s:InlineEdit(count, filetype)
     endfor
   endif
 endfunction
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
