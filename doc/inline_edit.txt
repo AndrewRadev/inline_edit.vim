@@ -134,9 +134,9 @@ SETTINGS                                                  *inline-edit-settings*
 
 These are the variables that control the behaviour of the plugin.
 
-                                                 *b:inline_edit_autowrite*
+                                                       *g:inline_edit_autowrite*
 >
-    let b:inline_edit_autowrite = 0
+    let g:inline_edit_autowrite = 0
 <
 
 Default value: 0
@@ -145,9 +145,9 @@ If this variable is set to 1, writing the temporary proxy buffer would also
 write the original buffer to its file. If it's 0, the original buffer will be
 modified, but not saved.
 
-                                                 *b:inline_edit_html_like_filetypes*
+                                             *g:inline_edit_html_like_filetypes*
 >
-    let b:inline_edit_html_like_filetypes = ['coldfusion', 'mako']
+    let g:inline_edit_html_like_filetypes = ['coldfusion', 'mako']
 <
 
 Default value: []
@@ -160,9 +160,9 @@ those as well.
 The reason for this is to be able to extend the plugin easier in this specific
 case (editing an html-like filetype).
 
-                                                 *b:inline_edit_proxy_type*
+                                                      *g:inline_edit_proxy_type*
 >
-    let b:inline_proxy_type = 'tempfile'
+    let g:inline_edit_proxy_type = 'tempfile'
 <
 
 Default value: "scratch"
