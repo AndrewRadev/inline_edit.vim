@@ -76,12 +76,14 @@ call add(g:inline_edit_patterns, {
       \ })
 
 command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
-function! s:InlineEdit(count, filetype)
-  if !exists('b:inline_edit_controller')
-    let b:inline_edit_controller = inline_edit#controller#New()
-  endif
+command! InlineEditJumpPrev call s:InlineEditJump(-1)
+command! InlineEditJumpNext call s:InlineEditJump(1)
 
-  let controller = b:inline_edit_controller
+nnoremap <Plug>InlineEditJumpPrev :InlineEditJumpPrev<cr>
+nnoremap <Plug>InlineEditJumpNext :InlineEditJumpNext<cr>
+
+function! s:InlineEdit(count, filetype)
+  let controller = s:Controller()
 
   if a:count > 0
     " then an area has been marked in visual mode
@@ -94,13 +96,78 @@ function! s:InlineEdit(count, filetype)
         return
       endif
     endfor
-
-    " Nothing found, try to locate a pattern in the buffer
-    let pattern = s:AutoLocate(controller, relevant_patterns)
-    if !empty(pattern)
-      call controller.Edit(pattern)
-    endif
   endif
+endfunction
+
+function! s:Controller()
+  if !exists('b:inline_edit_controller')
+    let b:inline_edit_controller = inline_edit#controller#New()
+  endif
+
+  return b:inline_edit_controller
+endfunction
+
+function! s:InlineEditJump(direction)
+  let controller        = s:Controller()
+  let relevant_patterns = s:PatternsForFiletype(&filetype)
+  let current_line      = line('.')
+  let saved_cursor      = winsaveview()
+  let found_entries     = {}
+
+  for entry in relevant_patterns
+    if !has_key(entry, 'start')
+      " there's no "start" pattern to look for
+      continue
+    end
+
+    call cursor(1, 1)
+
+    " special case: beginning of file
+    call search(entry.start. 'Wc')
+    let found = controller.PrepareEdit(entry)
+    if !empty(found)
+      let [start, end, _f, _i] = found
+      " attempt to locate based on start line
+      let found_entries[start] = entry
+    endif
+
+    while search(entry.start, 'We') > 0
+      let found = controller.PrepareEdit(entry)
+      if !empty(found)
+        let [start, end, _f, _i] = found
+        " attempt to locate based on start line
+        let found_entries[start] = entry
+      endif
+    endwhile
+  endfor
+
+  let found_lines  = map(keys(found_entries), 'str2nr(v:val)')
+
+  if a:direction > 0
+    let found_lines = filter(found_lines, 'v:val > '.current_line)
+  else
+    let found_lines = filter(found_lines, 'v:val < '.current_line)
+  endif
+
+  if empty(found_lines)
+    call winrestview(saved_cursor)
+    return {}
+  endif
+
+  let closest_line = found_lines[0]
+  let min_distance = abs(closest_line - current_line)
+
+  for line in found_lines
+    if abs(line - current_line) < min_distance
+      let closest_line = line
+      let min_distance = abs(line - current_line)
+    endif
+  endfor
+
+  exe closest_line
+  " normal! $
+
+  return found_entries[closest_line]
 endfunction
 
 function! s:PatternsForFiletype(filetype)
@@ -125,61 +192,4 @@ function! s:PatternsForFiletype(filetype)
   endfor
 
   return patterns
-endfunction
-
-function! s:AutoLocate(controller, patterns)
-  let current_line  = line('.')
-  let saved_cursor  = winsaveview()
-  let found_entries = {}
-
-  for entry in a:patterns
-    if !has_key(entry, 'start')
-      " there's no "start" pattern to look for
-      continue
-    end
-
-    call cursor(1, 1)
-
-    " special case: beginning of file
-    call search(entry.start. 'Wc')
-    let found = a:controller.PrepareEdit(entry)
-    if !empty(found)
-      let [start, end, _f, _i] = found
-      " attempt to locate based on both start and end lines.
-      let found_entries[start] = entry
-      let found_entries[end]   = entry
-    endif
-
-    while search(entry.start, 'We') > 0
-      let found = a:controller.PrepareEdit(entry)
-      if !empty(found)
-        let [start, end, _f, _i] = found
-        " attempt to locate based on both start and end lines.
-        let found_entries[start] = entry
-        let found_entries[end]   = entry
-      endif
-    endwhile
-  endfor
-
-  if !empty(found_entries)
-    let found_lines  = map(keys(found_entries), 'str2nr(v:val)')
-    let closest_line = found_lines[0]
-    let min_distance = abs(closest_line - current_line)
-
-    for line in found_lines
-      if abs(line - current_line) < min_distance
-        let closest_line = line
-        let min_distance = abs(line - current_line)
-      endif
-    endfor
-
-    " position in a nice place to trigger the edit
-    exe closest_line
-    normal! $
-
-    return found_entries[closest_line]
-  endif
-
-  call winrestview(saved_cursor)
-  return {}
 endfunction
