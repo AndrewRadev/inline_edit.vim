@@ -2,7 +2,7 @@ if exists('g:loaded_inline_edit') || &cp
   finish
 endif
 
-let g:loaded_inline_edit = '0.2.0' " version number
+let g:loaded_inline_edit = '0.2.1' " version number
 let s:keepcpo            = &cpo
 set cpo&vim
 
