@@ -55,6 +55,27 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \     'main_filetype': 'vue',
+      \     'sub_filetype':  'html',
+      \     'start':         '<template>',
+      \     'end':           '</template>'
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \     'main_filetype': 'vue',
+      \     'sub_filetype':  'javascript',
+      \     'start':         '<script>',
+      \     'end':           '</script>'
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \     'main_filetype': 'vue',
+      \     'sub_filetype':  'css',
+      \     'start':         '<style\>[^>]*>',
+      \     'end':           '</style>'
+      \ })
+
+call add(g:inline_edit_patterns, {
       \ 'main_filetype':     '*html',
       \ 'sub_filetype':      'javascript',
       \ 'indent_adjustment': 1,
