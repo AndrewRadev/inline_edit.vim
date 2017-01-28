@@ -181,6 +181,16 @@ executing |:make|). The drawback is that the only way to display information
 on the proxy is by hacking the statusline, which may cause issues and can't
 work reliably on all statuslines.
 
+                                                     *g:inline_edit_open_in_tab*
+>
+    let g:inline_edit_open_in_tab = 1
+<
+
+Default value: 0
+
+If this variable is set to 1, the temporary proxy will be open in a new tab.
+If it's 0, a split will be used.
+ 
 
 ==============================================================================
 EXTENDING                                                *inline-edit-extending*

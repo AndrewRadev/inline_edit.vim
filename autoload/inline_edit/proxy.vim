@@ -115,7 +115,12 @@ function! s:CreateProxyBuffer(proxy, lines)
   let &readonly = 0
 
   if g:inline_edit_proxy_type == 'scratch'
-    exe 'silent new'
+    if g:inline_edit_open_in_tab
+      exe 'silent tabe'
+    else
+      exe 'silent new'
+    endif
+
     setlocal buftype=acwrite
     setlocal bufhidden=wipe
     call append(0, lines)
