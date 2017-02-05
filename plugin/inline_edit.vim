@@ -55,24 +55,11 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
-      \     'main_filetype': 'vue',
-      \     'sub_filetype':  'html',
-      \     'start':         '<template>',
-      \     'end':           '</template>'
-      \ })
-
-call add(g:inline_edit_patterns, {
-      \     'main_filetype': 'vue',
-      \     'sub_filetype':  'javascript',
-      \     'start':         '<script>',
-      \     'end':           '</script>'
-      \ })
-
-call add(g:inline_edit_patterns, {
-      \     'main_filetype': 'vue',
-      \     'sub_filetype':  'css',
-      \     'start':         '<style\>[^>]*>',
-      \     'end':           '</style>'
+      \ 'main_filetype':     'vue',
+      \ 'sub_filetype':      'html',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<template>',
+      \ 'end':               '</template>'
       \ })
 
 call add(g:inline_edit_patterns, {
@@ -113,7 +100,7 @@ function! s:InlineEdit(count, filetype)
       if has_key(entry, 'main_filetype')
         if entry.main_filetype == '*html'
           " treat "*html" as a special case
-          let filetypes = ['html', 'eruby', 'php', 'eco'] + g:inline_edit_html_like_filetypes
+          let filetypes = ['html', 'eruby', 'php', 'eco', 'vue'] + g:inline_edit_html_like_filetypes
           let pattern_filetype = join(filetypes, '\|')
         else
           let pattern_filetype = entry.main_filetype
