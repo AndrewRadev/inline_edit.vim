@@ -26,8 +26,8 @@ if index(['scratch', 'tempfile'], g:inline_edit_proxy_type) < 0
   echoerr 'Inline Edit: Proxy type can''t be "'.g:inline_edit_proxy_type.'". Needs to be one of: scratch, tempfile'
 endif
 
-if !exists('g:inline_edit_open_in_tab')
-  let g:inline_edit_open_in_tab = 0
+if !exists('g:inline_edit_new_buffer_command')
+  let g:inline_edit_new_buffer_command = 'new'
 endif
 
 " Default patterns
