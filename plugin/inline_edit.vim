@@ -58,7 +58,7 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'vue',
       \ 'sub_filetype':      'html',
       \ 'indent_adjustment': 1,
-      \ 'start':             '<template>',
+      \ 'start':             '<template\>[^>]*>',
       \ 'end':               '</template>'
       \ })
 
