@@ -111,4 +111,29 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
   PYTHON
   ```
 
+- Vue Single File Components
+
+  ```vue
+  <template>
+    <p>{{ greeting }} World!</p>
+  </template>
+
+  <script>
+  module.exports = {
+    data: function () {
+      return {
+        greeting: 'Hello'
+      }
+    }
+  }
+  </script>
+
+  <style scoped>
+  p {
+    font-size: 2em;
+    text-align: center;
+  }
+  </style>
+  ```
+
 - Visual mode - any area that you mark
