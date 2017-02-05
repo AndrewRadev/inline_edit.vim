@@ -11,6 +11,13 @@ function! inline_edit#proxy#New(controller, start_line, end_line, filetype, inde
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer')
         \ }
 
+  let existing_content = join(getbufline(proxy.original_buffer, a:start_line, a:end_line), ' ')
+  if existing_content =~ '\S'
+    " then there's already some code, use its indent, if it's smaller
+    let common_indent = s:GetCommonIndent(a:start_line, a:end_line)
+    let proxy.indent = min([proxy.indent, common_indent])
+  endif
+
   let [lines, position] = s:LoadOriginalBufferContents(proxy)
   call s:CreateProxyBuffer(proxy, lines)
   call s:UpdateProxyBuffer(proxy)
@@ -177,4 +184,18 @@ function! s:PositionCursor(proxy, position)
   let position[1] = position[1] - proxy.start + 1
 
   call setpos('.', position)
+endfunction
+
+function! s:GetCommonIndent(start_line, end_line)
+  let common_indent = indent(a:start_line)
+  for lineno in range(a:start_line + 1, a:end_line)
+    if indent(lineno) < common_indent
+      let common_indent = indent(lineno)
+    endif
+  endfor
+
+  if !&expandtab
+    let common_indent = common_indent / &ts
+  endif
+  return common_indent
 endfunction
