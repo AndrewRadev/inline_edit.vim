@@ -26,6 +26,10 @@ if index(['scratch', 'tempfile'], g:inline_edit_proxy_type) < 0
   echoerr 'Inline Edit: Proxy type can''t be "'.g:inline_edit_proxy_type.'". Needs to be one of: scratch, tempfile'
 endif
 
+if !exists('g:inline_edit_new_buffer_command')
+  let g:inline_edit_new_buffer_command = 'new'
+endif
+
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
@@ -51,6 +55,14 @@ call add(g:inline_edit_patterns, {
       \ 'start':         '<<-\?\s*\(["'']\?\)\(\S*\)\1',
       \ 'main_filetype': 'sh\|ruby\|perl',
       \ 'callback':      'inline_edit#HereDoc'
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'vue',
+      \ 'sub_filetype':      'html',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<template\>[^>]*>',
+      \ 'end':               '</template>'
       \ })
 
 call add(g:inline_edit_patterns, {

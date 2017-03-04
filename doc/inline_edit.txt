@@ -181,6 +181,17 @@ executing |:make|). The drawback is that the only way to display information
 on the proxy is by hacking the statusline, which may cause issues and can't
 work reliably on all statuslines.
 
+                                              *g:inline_edit_new_buffer_command*
+>
+    let g:inline_edit_new_buffer_command = 'tabedit'
+<
+
+Default value: 'new'
+
+This variable is set to the command that will be used to open the proxy
+buffer.  You can use any buffer-opening command like "new", "rightbelow
+vertical new", etc.
+ 
 
 ==============================================================================
 EXTENDING                                                *inline-edit-extending*
