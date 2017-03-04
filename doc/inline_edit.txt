@@ -120,7 +120,12 @@ Blocks in django templates ~
       {% endblock %}
     </body>
 <
-
+Embedded languages within Vimscript ~
+>
+    python << EOF
+      print("OK")
+    EOF
+<
 Visual Mode ~
 
 If you'd like to work on an area that's not very well definable, |:InlineEdit|
@@ -191,7 +196,7 @@ Default value: 'new'
 This variable is set to the command that will be used to open the proxy
 buffer.  You can use any buffer-opening command like "new", "rightbelow
 vertical new", etc.
- 
+
 
 ==============================================================================
 EXTENDING                                                *inline-edit-extending*
