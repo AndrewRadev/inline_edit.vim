@@ -189,7 +189,7 @@ endfunction
 function! s:GetCommonIndent(start_line, end_line)
   let common_indent = indent(a:start_line)
   for lineno in range(a:start_line + 1, a:end_line)
-    if indent(lineno) < common_indent
+    if getline(lineno) !~ '^\s*$' && indent(lineno) < common_indent
       let common_indent = indent(lineno)
     endif
   endfor

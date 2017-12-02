@@ -154,7 +154,7 @@ function! inline_edit#HereDoc()
   " if the start of the new document is after the current line, then move
   " down one, otherwise stay put.
   if line('.') < start
-    normal <Down>
+    normal! j
   endif
 
   " find the end of the inline area
