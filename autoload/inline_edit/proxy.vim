@@ -26,9 +26,9 @@ function! inline_edit#proxy#New(controller, start_line, end_line, filetype, inde
 
   " On writing proxy buffer, update original one
   if g:inline_edit_proxy_type == 'scratch'
-    autocmd BufWriteCmd <buffer> silent call b:proxy.UpdateOriginalBuffer()
+    autocmd BufWriteCmd <buffer> silent call b:inline_edit_proxy.UpdateOriginalBuffer()
   elseif g:inline_edit_proxy_type == 'tempfile'
-    autocmd BufWritePost <buffer> silent call b:proxy.UpdateOriginalBuffer()
+    autocmd BufWritePost <buffer> silent call b:inline_edit_proxy.UpdateOriginalBuffer()
   endif
 
   return proxy
@@ -149,7 +149,8 @@ endfunction
 " Called once upon setup and then after every write. After the actual updating
 " logic is finished, this sets up some needed buffer properties.
 function! s:UpdateProxyBuffer(proxy)
-  let b:proxy = a:proxy
+  let b:inline_edit_proxy = a:proxy
+  let b:proxy = b:inline_edit_proxy " for compatibility's sake
 
   if a:proxy.filetype == ''
     " attempt autodetection
@@ -168,7 +169,7 @@ function! s:SetStatusline(proxy)
   endif
 
   let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
-  let statusline = printf('[%s:%%{b:proxy.start}-%%{b:proxy.end}]', short_filename)
+  let statusline = printf('[%s:%%{b:inline_edit_proxy.start}-%%{b:proxy.end}]', short_filename)
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
   endif
