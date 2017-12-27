@@ -286,6 +286,16 @@ inspiration.
 If the callback function fails to find the area, it should return an empty
 dictionary.
 
+Deeper control ~
+
+If you'd like more programmatic control over the proxy buffers, you can access
+the object that holds the proxy buffer's state by using the buffer-local
+`b:inline_edit_proxy` variable. Inspect it (or read the code in
+autoload/inline_edit/proxy.vim) to understand what information you can get.
+
+For instance, that variable is used to show statusline information about the
+original file name and the line numbers that correspond to the original buffer.
+
 
 ==============================================================================
 ISSUES                                                      *inline-edit-issues*
