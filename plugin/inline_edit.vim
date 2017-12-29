@@ -30,6 +30,10 @@ if !exists('g:inline_edit_new_buffer_command')
   let g:inline_edit_new_buffer_command = 'new'
 endif
 
+if !exists('g:inline_edit_modify_statusline')
+  let g:inline_edit_modify_statusline = 1
+endif
+
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',

@@ -129,10 +129,6 @@ function! s:CreateProxyBuffer(proxy, lines)
     call append(0, lines)
     $delete _
     set nomodified
-
-    let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
-    let filename = printf('[%s:%d-%d]', short_filename, proxy.start, proxy.end)
-    silent exec 'keepalt file ' . escape(filename, '[')
   elseif g:inline_edit_proxy_type == 'tempfile'
     exe 'silent split ' . tempname()
     call append(0, lines)
@@ -152,6 +148,22 @@ function! s:UpdateProxyBuffer(proxy)
   let b:inline_edit_proxy = a:proxy
   let b:proxy = b:inline_edit_proxy " for compatibility's sake
 
+  let a:proxy.description = printf('[%s:%d-%d]',
+        \ fnamemodify(a:proxy.original_buffer, ':~:.'),
+        \ a:proxy.start,
+        \ a:proxy.end)
+
+  if g:inline_edit_proxy_type == 'scratch'
+    silent exec 'keepalt file ' . escape(a:proxy.description, '[ ')
+  elseif g:inline_edit_proxy_type == 'tempfile'
+    if g:inline_edit_modify_statusline
+      if &statusline =~ '%[fF]'
+        let statusline = substitute(&statusline, '%[fF]', '%{b:inline_edit_proxy.description}', '')
+        exe "setlocal statusline=" . escape(statusline, ' |')
+      endif
+    endif
+  endif
+
   if a:proxy.filetype == ''
     " attempt autodetection
     filetype detect
@@ -168,12 +180,10 @@ function! s:SetStatusline(proxy)
     return
   endif
 
-  let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
-  let statusline = printf('[%s:%%{b:inline_edit_proxy.start}-%%{b:inline_edit_proxy.end}]', short_filename)
-  if &statusline =~ '%[fF]'
-    let statusline = substitute(&statusline, '%[fF]', statusline, '')
+  if !g:inline_edit_modify_statusline
+    return
   endif
-  exe "setlocal statusline=" . escape(statusline, ' |')
+
 endfunction
 
 " Called once upon setup. Positions the cursor where it was in the original

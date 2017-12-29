@@ -167,7 +167,7 @@ case (editing an html-like filetype).
 
                                                       *g:inline_edit_proxy_type*
 >
-    let g:inline_edit_proxy_type = 'tempfile'
+    let g:inline_edit_proxy_type = "tempfile"
 <
 
 Default value: "scratch"
@@ -188,14 +188,32 @@ work reliably on all statuslines.
 
                                               *g:inline_edit_new_buffer_command*
 >
-    let g:inline_edit_new_buffer_command = 'tabedit'
+    let g:inline_edit_new_buffer_command = "tabedit"
 <
 
-Default value: 'new'
+Default value: "new"
 
 This variable is set to the command that will be used to open the proxy
 buffer.  You can use any buffer-opening command like "new", "rightbelow
 vertical new", etc.
+
+                                              *g:inline_edit_modify_statusline*
+>
+    let g:inline_edit_modify_statusline = 0
+<
+
+Default value: 1
+
+By default, for the "tempfile" value of |g:inline_edit_proxy_type|, the plugin
+attempts to find any instances of `%f` or `%F` in the statusline and replace
+them with the description of the proxy buffer. This has the form of:
+>
+    [<filename>:<line1>-<line2>]
+<
+If you're using a fancy statusline plugin, or don't like this standard
+behaviour, you can disable it by setting |g:inline_edit_modify_statusline| to
+0. You can still show this description programmatically by accessing
+`b:inline_edit_proxy.description` within the proxy buffer.
 
 
 ==============================================================================
