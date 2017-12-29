@@ -169,7 +169,7 @@ function! s:SetStatusline(proxy)
   endif
 
   let short_filename = fnamemodify(a:proxy.original_buffer, ':~:.')
-  let statusline = printf('[%s:%%{b:inline_edit_proxy.start}-%%{b:proxy.end}]', short_filename)
+  let statusline = printf('[%s:%%{b:inline_edit_proxy.start}-%%{b:inline_edit_proxy.end}]', short_filename)
   if &statusline =~ '%[fF]'
     let statusline = substitute(&statusline, '%[fF]', statusline, '')
   endif
