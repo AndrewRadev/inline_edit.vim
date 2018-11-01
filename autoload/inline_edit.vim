@@ -125,7 +125,7 @@ function! inline_edit#HereDoc()
   "   << 'ABC'
   "   <<WXYZ
   "   cat <<-EOF > newfile
-  let start_pattern = '<<-\?\s*\(["'']\?\)\(\S*\)\1'
+  let start_pattern = '<<[-~]\?\s*\(["'']\?\)\(\S*\)\1'
 
   call inline_edit#PushCursor()
 
