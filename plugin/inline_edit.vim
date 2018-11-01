@@ -88,7 +88,8 @@ call add(g:inline_edit_patterns, {
       \ 'end':           '{%\s*endblock\s*%}',
       \ })
 
-command! -count=0 -nargs=* InlineEdit call s:InlineEdit(<count>, <q-args>)
+command! -count=0 -nargs=* -complete=filetype
+      \ InlineEdit call s:InlineEdit(<count>, <q-args>)
 function! s:InlineEdit(count, filetype)
   if !exists('b:inline_edit_controller')
     let b:inline_edit_controller = inline_edit#controller#New()
