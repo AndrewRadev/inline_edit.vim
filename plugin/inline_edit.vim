@@ -88,8 +88,15 @@ call add(g:inline_edit_patterns, {
       \ 'end':           '{%\s*endblock\s*%}',
       \ })
 
-command! -count=0 -nargs=* -complete=filetype
-      \ InlineEdit call s:InlineEdit(<count>, <q-args>)
+if has('patch-7.4.542')
+  " Without -addr=lines, a recent Vim version fails with an E14:
+  command! -count=0 -nargs=* -complete=filetype -addr=lines
+        \ InlineEdit call s:InlineEdit(<count>, <q-args>)
+else
+  command! -count=0 -nargs=* -complete=filetype
+        \ InlineEdit call s:InlineEdit(<count>, <q-args>)
+endif
+
 function! s:InlineEdit(count, filetype)
   if !exists('b:inline_edit_controller')
     let b:inline_edit_controller = inline_edit#controller#New()
