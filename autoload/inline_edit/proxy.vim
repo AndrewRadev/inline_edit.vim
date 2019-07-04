@@ -154,7 +154,7 @@ function! s:UpdateProxyBuffer(proxy)
         \ a:proxy.end)
 
   if g:inline_edit_proxy_type == 'scratch'
-    silent exec 'keepalt file ' . escape(a:proxy.description, '[ ')
+    silent exec 'keepalt file ' . fnameescape(a:proxy.description)
   elseif g:inline_edit_proxy_type == 'tempfile'
     if g:inline_edit_modify_statusline
       if &statusline =~ '%[fF]'
