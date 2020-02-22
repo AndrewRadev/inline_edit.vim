@@ -88,6 +88,20 @@ call add(g:inline_edit_patterns, {
       \ 'end':           '{%\s*endblock\s*%}',
       \ })
 
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'haml',
+      \ 'sub_filetype':  'javascript',
+      \ 'start':         '^\s*:javascript\>',
+      \ 'indent_based':  1,
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'haml',
+      \ 'sub_filetype':  'css',
+      \ 'start':         '^\s*:css\>',
+      \ 'indent_based':  1,
+      \ })
+
 command! -range=0 -nargs=* -complete=filetype
       \ InlineEdit call s:InlineEdit(<count>, <q-args>)
 
@@ -124,7 +138,9 @@ function! s:InlineEdit(count, filetype)
           call call(controller.NewProxy, result, controller)
           return
         endif
-      elseif controller.PatternEdit(entry)
+      elseif get(entry, 'indent_based', 0) && controller.IndentEdit(entry)
+        return
+      elseif !get(entry, 'indent_based', 0) && controller.PatternEdit(entry)
         return
       endif
     endfor
