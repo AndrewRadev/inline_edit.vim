@@ -343,7 +343,7 @@ function inline_edit#MarkdownFencedCode() in "autoload/inline_edit.vim" for
 inspiration.
 
 If the callback function fails to find the area, it should return an empty
-dictionary.
+list.
 
 Deeper control ~
 
