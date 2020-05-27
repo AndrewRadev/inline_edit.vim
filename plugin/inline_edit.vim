@@ -14,6 +14,10 @@ if !exists('g:inline_edit_autowrite')
   let g:inline_edit_autowrite = 0
 endif
 
+if !exists('g:inline_edit_python_guess_sql')
+  let g:inline_edit_python_guess_sql = 1
+endif
+
 if !exists('g:inline_edit_html_like_filetypes')
   let g:inline_edit_html_like_filetypes = []
 endif

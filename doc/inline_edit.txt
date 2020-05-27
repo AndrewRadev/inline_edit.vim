@@ -209,6 +209,18 @@ This variable is set to the command that will be used to open the proxy
 buffer.  You can use any buffer-opening command like "new", "rightbelow
 vertical new", etc.
 
+                                              *g:inline_edit_python_guess_sql*
+>
+    let g:inline_edit_python_guess_sql = 0
+<
+
+Default value: 1
+
+By default, when a multiline string in Python is matched, the plugin will try
+to guess whether the text is a SQL statement. The detection is based on SQL
+keywords and is very rudimentary, easily allowing for false positives. This
+option controls whether the SQL detection is enabled.
+
                                               *g:inline_edit_modify_statusline*
 >
     let g:inline_edit_modify_statusline = 0
