@@ -180,51 +180,48 @@ endfunction
 function! inline_edit#PythonMultilineString()
   call inline_edit#PushCursor()
 
-  normal! 0
+  try
+    normal! 0
 
-  if !s:check_inside_python_string()
+    if !s:CheckInsidePythonString()
+      return []
+    endif
+
+    normal! $
+
+    if !s:CheckInsidePythonString()
+      return []
+    endif
+
+    " We are inside a Python multiline string, so we have to find the boundaries
+    let quote_type = search('"""\|\(''''''\)', 'bWp')
+
+    if quote_type == 0
+      return []
+    endif
+
+    let start = line('.') + 1
+
+    if quote_type == 1
+      let end_quote = '"""'
+    elseif quote_type == 2
+      let end_quote = "'''"
+    else
+      echoerr "Invalid quote pattern found"
+      return []
+    endif
+
+    let end = search(end_quote, 'W')
+
+    if end == 0
+      " No end quote was found
+      return []
+    endif
+
+    let end = end - 1
+  finally
     call inline_edit#PopCursor()
-    return []
-  endif
-
-  normal! $
-
-  if !s:check_inside_python_string()
-    call inline_edit#PopCursor()
-    return []
-  endif
-
-  " We are inside a Python multiline string, so we have to find the boundaries
-  let quote_type = search('"""\|\(''''''\)', 'bWp')
-
-  if quote_type == 0
-
-    call inline_edit#PopCursor()
-    return []
-  endif
-
-  let start = line('.') + 1
-
-  if quote_type == 1
-    let end_quote = '"""'
-  elseif quote_type == 2
-    let end_quote = "'''"
-  else
-    echoerr "Invalid quote pattern found"
-    return []
-  endif
-
-  let end = search(end_quote, 'W')
-
-  if end == 0
-    " No end quote was found
-    call inline_edit#PopCursor()
-    return []
-  endif
-
-  let end = end - 1
-
-  call inline_edit#PopCursor()
+  endtry
 
   let lines = join(getline(start, end), "\n")
 
