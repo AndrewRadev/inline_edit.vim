@@ -175,9 +175,6 @@ endfunction
 
 " function! inline_edit#PythonQuotedString() {{{2
 
-function s:check_inside_python_string()
-  return index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "pythonString") >= 0
-endfunction
 " Opens up a new proxy buffer with the contents of a fenced code block in
 " github-flavoured markdown.
 function! inline_edit#PythonMultilineString()
@@ -252,4 +249,8 @@ function! inline_edit#PythonMultilineString()
   endfor
 
   return [start, end, filetype, indent]
+endfunction
+
+function s:CheckInsidePythonString()
+  return index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "pythonString") >= 0
 endfunction
