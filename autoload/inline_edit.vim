@@ -218,7 +218,7 @@ function! inline_edit#PythonMultilineString()
       return []
     endif
 
-    let end = end - 1
+    let end -= 1
   finally
     call inline_edit#PopCursor()
   endtry
@@ -227,8 +227,8 @@ function! inline_edit#PythonMultilineString()
 
   " We try to guess the filetype
   if g:inline_edit_python_guess_sql && (
-      \ lines =~? '\<SELECT\>\_.*\<FROM\>'
-      \ || lines =~? '\<CREATE\>\_s*\<OR\>\_s*\<REPLACE\>'
+      \ lines =~# '\<SELECT\>\_.*\<FROM\>'
+      \ || lines =~# '\<CREATE\>\_s*\<OR\>\_s*\<REPLACE\>'
       \ )
     " This is a SQL file
     let filetype = 'sql'
