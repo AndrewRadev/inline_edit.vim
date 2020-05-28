@@ -14,6 +14,10 @@ if !exists('g:inline_edit_autowrite')
   let g:inline_edit_autowrite = 0
 endif
 
+if !exists('g:inline_edit_python_guess_sql')
+  let g:inline_edit_python_guess_sql = 1
+endif
+
 if !exists('g:inline_edit_html_like_filetypes')
   let g:inline_edit_html_like_filetypes = []
 endif
@@ -44,6 +48,12 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'vim',
       \ 'callback':      'inline_edit#VimEmbeddedScript'
       \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'python',
+      \ 'callback':      'inline_edit#PythonMultilineString'
+      \ })
+
 
 call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'ruby',
