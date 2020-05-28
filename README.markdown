@@ -59,7 +59,7 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
   end
   ```
 
-- Python multiline strings (tries to guess SQL syntax)
+- Python multiline strings (tries to guess SQL syntax) (Thanks to [@thalesmello](https://github.com/thalesmello))
 
   ``` python
   sql_query = """
@@ -132,7 +132,7 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
   PYTHON
   ```
 
-- Vue Single File Components
+- Vue Single File Components (Thanks to [@fvictorio](https://github.com/fvictorio))
 
   ```vue
   <template>
