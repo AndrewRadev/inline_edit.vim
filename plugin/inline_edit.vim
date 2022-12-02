@@ -77,11 +77,27 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'vue',
+      \ 'sub_filetype':      'typescript',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<script[^>]*lang=["'']ts["''][^>]*>',
+      \ 'end':               '</script>',
+      \ })
+
+call add(g:inline_edit_patterns, {
       \ 'main_filetype':     '*html',
       \ 'sub_filetype':      'javascript',
       \ 'indent_adjustment': 1,
       \ 'start':             '<script\>[^>]*>',
       \ 'end':               '</script>',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'vue',
+      \ 'sub_filetype':      'scss',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<style[^>]*lang=["'']scss["''][^>]*>',
+      \ 'end':               '</style>',
       \ })
 
 call add(g:inline_edit_patterns, {
