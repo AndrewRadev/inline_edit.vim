@@ -132,7 +132,7 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'typescript',
       \ 'sub_filetype':  'html',
       \ 'start':         '^\s*template:\s*`',
-      \ 'end':           '`,'
+      \ 'end':           '`\(,\|$\)'
       \ })
 
 command! -range=0 -nargs=* -complete=filetype
