@@ -253,28 +253,17 @@ function! inline_edit#AngularHtmlTemplate()
   call inline_edit#PushCursor()
 
   try
-    normal! 0
-
     if !s:CheckInsideAngularInlineHtmlTemplate()
       return []
     endif
 
-    normal! $
-
-    if !s:CheckInsideAngularInlineHtmlTemplate()
-      return []
-    endif
-
-    let start_backtick = search('^\s*template:\s*`', 'bW')
-
+    let start_backtick = search('^\s*template:\s*`\s*$', 'bWe')
     if start_backtick == 0
       return []
     endif
 
-    normal! $
-
     let start = line('.') + 1
-    let end = search('`\(,\|$\)', 'W')
+    let end = search('^\s*`\(,\|$\)', 'W')
 
     if end == 0
       " No end quote was found
@@ -305,20 +294,11 @@ function! inline_edit#AngularCssTemplate()
   call inline_edit#PushCursor()
 
   try
-    normal! 0
-
-    if !s:CheckInsideAngularInlineCssTemplate()
-      return []
-    endif
-
-    normal! $
-
     if !s:CheckInsideAngularInlineCssTemplate()
       return []
     endif
 
     let start_backtick = search('`', 'bW')
-
     if start_backtick == 0
       return []
     endif
