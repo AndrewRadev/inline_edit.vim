@@ -275,16 +275,7 @@ function! inline_edit#AngularHtmlTemplate()
     call inline_edit#PopCursor()
   endtry
 
-  let lines = join(getline(start, end), "\n")
-
-  let indent = indent(start)
-  for i in range(start + 1, end)
-    let current_indent = indent(i)
-    " Get the minimum indent of the non-blank lines
-    if current_indent < indent && getline(i) !~? '^\s*$'
-      let indent = current_indent
-    endif
-  endfor
+  let indent = s:GetCommonIndent(start, end)
 
   return [start, end, 'html', indent]
 endfunction
@@ -318,16 +309,7 @@ function! inline_edit#AngularCssTemplate()
     call inline_edit#PopCursor()
   endtry
 
-  let lines = join(getline(start, end), "\n")
-
-  let indent = indent(start)
-  for i in range(start + 1, end)
-    let current_indent = indent(i)
-    " Get the minimum indent of the non-blank lines
-    if current_indent < indent && getline(i) !~? '^\s*$'
-      let indent = current_indent
-    endif
-  endfor
+  let indent = s:GetCommonIndent(start, end)
 
   return [start, end, 'css', indent]
 endfunction
@@ -337,17 +319,46 @@ function s:CheckInsidePythonString()
 endfunction
 
 function s:CheckInsideAngularInlineCssTemplate()
-  let l:inside_typescript_template = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptTemplate") >= 0
-  let l:inside_typescript_array = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptArray") >= 0
-  let l:inside_typescript_object_literal = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptObjectLiteral") >= 0
-  let l:inside_typescript_object_func_call_arg = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptFuncCallArg") >= 0
-  return l:inside_typescript_template && l:inside_typescript_array && l:inside_typescript_object_literal && l:inside_typescript_object_func_call_arg
+  let syntax_groups = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+
+  let inside_typescript_template = index(syntax_groups, "typescriptTemplate") >= 0
+  let inside_typescript_array = index(syntax_groups, "typescriptArray") >= 0
+  let inside_typescript_object_literal = index(syntax_groups, "typescriptObjectLiteral") >= 0
+  let inside_typescript_object_func_call_arg = index(syntax_groups, "typescriptFuncCallArg") >= 0
+
+  return
+        \ inside_typescript_template &&
+        \ inside_typescript_array &&
+        \ inside_typescript_object_literal &&
+        \ inside_typescript_object_func_call_arg
 endfunction
 
 function s:CheckInsideAngularInlineHtmlTemplate()
-  let l:inside_typescript_template = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptTemplate") >= 0
-  let l:inside_typescript_array = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptArray") >= 0
-  let l:inside_typescript_object_literal = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptObjectLiteral") >= 0
-  let l:inside_typescript_object_func_call_arg = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptFuncCallArg") >= 0
-  return l:inside_typescript_template && !l:inside_typescript_array && l:inside_typescript_object_literal && l:inside_typescript_object_func_call_arg
+  let syntax_groups = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+
+  let inside_typescript_template = index(syntax_groups, "typescriptTemplate") >= 0
+  let inside_typescript_array = index(syntax_groups, "typescriptArray") >= 0
+  let inside_typescript_object_literal = index(syntax_groups, "typescriptObjectLiteral") >= 0
+  let inside_typescript_object_func_call_arg = index(syntax_groups, "typescriptFuncCallArg") >= 0
+
+  return
+        \ inside_typescript_template &&
+        \ !inside_typescript_array &&
+        \ inside_typescript_object_literal &&
+        \ inside_typescript_object_func_call_arg
+endfunction
+
+function s:GetCommonIndent(start, end)
+  let indent = indent(a:start)
+
+  for i in range(a:start + 1, a:end)
+    let current_indent = indent(i)
+
+    " Get the minimum indent of the non-blank lines
+    if current_indent < indent && getline(i) !~? '^\s*$'
+      let indent = current_indent
+    endif
+  endfor
+
+  return indent
 endfunction
