@@ -253,7 +253,8 @@ function! inline_edit#AngularHtmlTemplate()
   call inline_edit#PushCursor()
 
   try
-    if !s:CheckInsideAngularInlineHtmlTemplate()
+    let [component_start, component_end] = s:CheckInsideAngularComponent()
+    if component_start < 0
       return []
     endif
 
@@ -285,26 +286,35 @@ function! inline_edit#AngularCssTemplate()
   call inline_edit#PushCursor()
 
   try
-    if !s:CheckInsideAngularInlineCssTemplate()
+    let [component_start, _] = s:CheckInsideAngularComponent()
+    if component_start < 0
       return []
     endif
 
-    let start_backtick = search('`', 'bW')
+    let [array_start, array_end] = s:CheckInsideStylesArray()
+    if array_start < 0
+      return []
+    endif
+
+    let start_backtick = search('`', 'bWe', array_start)
     if start_backtick == 0
       return []
     endif
 
-    normal! $
-
     let start = line('.') + 1
+    let end = search('`\(,\|$\)', 'W', array_end)
 
-    let end = search('`\(,\|$\)', 'W')
     if end == 0
       " No end quote was found
       return []
     endif
 
     let end -= 1
+
+    if end - start <= 0
+      " no multiline content
+      return []
+    endif
   finally
     call inline_edit#PopCursor()
   endtry
@@ -318,34 +328,60 @@ function s:CheckInsidePythonString()
   return index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "pythonString") >= 0
 endfunction
 
-function s:CheckInsideAngularInlineCssTemplate()
-  let syntax_groups = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+function s:CheckInsideAngularComponent()
+  let current_pos = getpos('.')
+  let saved_view = winsaveview()
 
-  let inside_typescript_template = index(syntax_groups, "typescriptTemplate") >= 0
-  let inside_typescript_array = index(syntax_groups, "typescriptArray") >= 0
-  let inside_typescript_object_literal = index(syntax_groups, "typescriptObjectLiteral") >= 0
-  let inside_typescript_object_func_call_arg = index(syntax_groups, "typescriptFuncCallArg") >= 0
+  try
+    if search('^\s*@Component({', 'bWe') <= 0
+      return [-1, -1]
+    endif
 
-  return
-        \ inside_typescript_template &&
-        \ inside_typescript_array &&
-        \ inside_typescript_object_literal &&
-        \ inside_typescript_object_func_call_arg
+    let start_pos = getpos('.')
+
+    let skip_syntax = s:SkipSyntax(['typescriptString', 'typescriptTemplate', 'typescriptComment'])
+    if searchpair('{', '', '}', 'W', skip_syntax) <= 0
+      return [-1, -1]
+    endif
+
+    let end_pos = getpos('.')
+
+    if s:PosInside(current_pos, start_pos, end_pos)
+      return [start_pos[1], end_pos[1]]
+    else
+      return [-1, -1]
+    endif
+  finally
+    call winrestview(saved_view)
+  endtry
 endfunction
 
-function s:CheckInsideAngularInlineHtmlTemplate()
-  let syntax_groups = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+function s:CheckInsideStylesArray()
+  let current_pos = getpos('.')
+  let saved_view = winsaveview()
 
-  let inside_typescript_template = index(syntax_groups, "typescriptTemplate") >= 0
-  let inside_typescript_array = index(syntax_groups, "typescriptArray") >= 0
-  let inside_typescript_object_literal = index(syntax_groups, "typescriptObjectLiteral") >= 0
-  let inside_typescript_object_func_call_arg = index(syntax_groups, "typescriptFuncCallArg") >= 0
+  try
+    if search('^\s*styles:\s*[', 'bWe') <= 0
+      return [-1, -1]
+    endif
 
-  return
-        \ inside_typescript_template &&
-        \ !inside_typescript_array &&
-        \ inside_typescript_object_literal &&
-        \ inside_typescript_object_func_call_arg
+    let start_pos = getpos('.')
+
+    let skip_syntax = s:SkipSyntax(['typescriptString', 'typescriptTemplate', 'typescriptComment'])
+    if searchpair('\[', '', '\]', 'W', skip_syntax) <= 0
+      return [-1, -1]
+    endif
+
+    let end_pos = getpos('.')
+
+    if s:PosInside(current_pos, start_pos, end_pos)
+      return [start_pos[1], end_pos[1]]
+    else
+      return [-1, -1]
+    endif
+  finally
+    call winrestview(saved_view)
+  endtry
 endfunction
 
 function s:GetCommonIndent(start, end)
@@ -361,4 +397,30 @@ function s:GetCommonIndent(start, end)
   endfor
 
   return indent
+endfunction
+
+function s:SkipSyntax(syntax_groups)
+  let skip_pattern  = '\%('.join(a:syntax_groups, '\|').'\)'
+  return "synIDattr(synID(line('.'),col('.'),1),'name') =~# '".skip_pattern."'"
+endfunction
+
+function! s:PosInside(current, start, end) abort
+  let [_, current_line, current_col, _] = a:current
+  let [_, start_line, start_col, _]     = a:start
+  let [_, end_line, end_col, _]         = a:end
+
+  " If the start and end are the same, we don't have anything to edit
+  if start_line == end_line
+    return 0
+  endif
+
+  if current_line > start_line && current_line < end_line
+    return 1
+  elseif current_line == start_line && current_line <= end_line && current_col > start_col
+    return 1
+  elseif current_line == end_line && current_line => start_line && current_col < end_col
+    return 1
+  else
+    return 0
+  endif
 endfunction

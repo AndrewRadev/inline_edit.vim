@@ -6,6 +6,10 @@
       .my-p {
         color: orange;
       }
+    `, `
+      .my-div {
+        color: green;
+      }
     `,
   ],
 })
