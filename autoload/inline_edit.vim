@@ -251,3 +251,127 @@ endfunction
 function s:CheckInsidePythonString()
   return index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "pythonString") >= 0
 endfunction
+" function! inline_edit#AngularHtmlTemplate() {{{2
+
+function! inline_edit#AngularHtmlTemplate()
+  call inline_edit#PushCursor()
+
+  try
+    normal! 0
+
+    if !CheckInsideAngularInlineHtmlTemplate()
+      return []
+    endif
+
+    normal! $
+
+    if !CheckInsideAngularInlineHtmlTemplate()
+      return []
+    endif
+
+    let start_backtick = search('^\s*template:\s*`', 'bW')
+
+    if start_backtick == 0
+      return []
+    endif
+
+    normal! $
+
+    echom "start " . start_backtick . ' line ' . line('.')
+    let start = line('.') + 1
+
+    let end = search('`\(,\|$\)', 'W')
+    echom end
+    if end == 0
+      " No end quote was found
+      return []
+    endif
+
+    let end -= 1
+  finally
+    call inline_edit#PopCursor()
+  endtry
+
+  let lines = join(getline(start, end), "\n")
+
+  let indent = indent(start)
+  for i in range(start + 1, end)
+    let current_indent = indent(i)
+    " Get the minimum indent of the non-blank lines
+    if current_indent < indent && getline(i) !~? '^\s*$'
+      let indent = current_indent
+    endif
+  endfor
+
+  return [start, end, 'html', indent]
+endfunction
+
+function CheckInsideAngularInlineHtmlTemplate()
+  let l:inside_typescript_template = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptTemplate") >= 0
+  let l:inside_typescript_array = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptArray") >= 0
+  let l:inside_typescript_object_literal = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptObjectLiteral") >= 0
+  let l:inside_typescript_object_func_call_arg = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptFuncCallArg") >= 0
+  return l:inside_typescript_template && !l:inside_typescript_array && l:inside_typescript_object_literal && l:inside_typescript_object_func_call_arg
+endfunction
+" function! inline_edit#AngularCssTemplate() {{{2
+
+function! inline_edit#AngularCssTemplate()
+  call inline_edit#PushCursor()
+
+  try
+    normal! 0
+
+    if !CheckInsideAngularInlineCssTemplate()
+      return []
+    endif
+
+    normal! $
+
+    if !CheckInsideAngularInlineCssTemplate()
+      return []
+    endif
+
+    let start_backtick = search('`', 'bW')
+
+    if start_backtick == 0
+      return []
+    endif
+
+    normal! $
+
+    echom "start " . start_backtick . ' line ' . line('.')
+    let start = line('.') + 1
+
+    let end = search('`\(,\|$\)', 'W')
+    echom end
+    if end == 0
+      " No end quote was found
+      return []
+    endif
+
+    let end -= 1
+  finally
+    call inline_edit#PopCursor()
+  endtry
+
+  let lines = join(getline(start, end), "\n")
+
+  let indent = indent(start)
+  for i in range(start + 1, end)
+    let current_indent = indent(i)
+    " Get the minimum indent of the non-blank lines
+    if current_indent < indent && getline(i) !~? '^\s*$'
+      let indent = current_indent
+    endif
+  endfor
+
+  return [start, end, 'css', indent]
+endfunction
+
+function CheckInsideAngularInlineCssTemplate()
+  let l:inside_typescript_template = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptTemplate") >= 0
+  let l:inside_typescript_array = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptArray") >= 0
+  let l:inside_typescript_object_literal = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptObjectLiteral") >= 0
+  let l:inside_typescript_object_func_call_arg = index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "typescriptFuncCallArg") >= 0
+  return l:inside_typescript_template && l:inside_typescript_array && l:inside_typescript_object_literal && l:inside_typescript_object_func_call_arg
+endfunction
