@@ -263,7 +263,8 @@ function! inline_edit#AngularHtmlTemplate()
       return []
     endif
 
-    let start = line('.') + 1
+    normal! j0
+    let start = line('.')
     let end = search('^\s*`\(,\|$\)', 'W')
 
     if end == 0
@@ -296,13 +297,14 @@ function! inline_edit#AngularCssTemplate()
       return []
     endif
 
-    let start_backtick = search('`', 'bWe', array_start)
+    let start_backtick = search('`', 'bWec', array_start)
     if start_backtick == 0
       return []
     endif
 
-    let start = line('.') + 1
-    let end = search('`\(,\|$\)', 'W', array_end)
+    normal! j0
+    let start = line('.')
+    let end = search('`\(,\|$\)', 'Wc', array_end)
 
     if end == 0
       " No end quote was found
@@ -418,7 +420,7 @@ function! s:PosInside(current, start, end) abort
     return 1
   elseif current_line == start_line && current_line <= end_line && current_col > start_col
     return 1
-  elseif current_line == end_line && current_line => start_line && current_col < end_col
+  elseif current_line == end_line && current_line >= start_line && current_col < end_col
     return 1
   else
     return 0

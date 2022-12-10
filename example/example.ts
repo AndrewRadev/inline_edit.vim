@@ -10,7 +10,9 @@
       .my-div {
         color: green;
       }
+    `, `
     `,
+    ``
   ],
 })
 
@@ -18,6 +20,9 @@
   selector: 'my-component',
   template: `
     <p>my-component works!</p>
+    `,
+
+  template: `
     `,
 })
 class MyComponent
