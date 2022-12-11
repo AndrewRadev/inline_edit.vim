@@ -122,7 +122,7 @@ function! s:CreateProxyBuffer(proxy, lines)
   let &readonly = 0
 
   if g:inline_edit_proxy_type == 'scratch'
-    exe 'silent ' . g:inline_edit_new_buffer_command
+    exe 'silent noswapfile ' . g:inline_edit_new_buffer_command
 
     setlocal buftype=acwrite
     setlocal bufhidden=wipe
@@ -130,7 +130,7 @@ function! s:CreateProxyBuffer(proxy, lines)
     $delete _
     set nomodified
   elseif g:inline_edit_proxy_type == 'tempfile'
-    exe 'silent split ' . tempname()
+    exe 'silent noswapfile split ' . tempname()
     call append(0, lines)
     $delete _
     write
