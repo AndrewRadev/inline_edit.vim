@@ -251,6 +251,7 @@ endfunction
 " function! inline_edit#AngularHtmlTemplate() {{{2
 function! inline_edit#AngularHtmlTemplate()
   call inline_edit#PushCursor()
+  let cursor_line = line('.')
 
   try
     let [component_start, component_end] = s:CheckInsideAngularComponent()
@@ -267,8 +268,8 @@ function! inline_edit#AngularHtmlTemplate()
     let start = line('.')
     let end = search('^\s*`\(,\|$\)', 'W')
 
-    if end == 0
-      " No end quote was found
+    if end == 0 || end < cursor_line
+      " No end quote was found or end quote was above cursor
       return []
     endif
 
@@ -285,6 +286,7 @@ endfunction
 " function! inline_edit#AngularCssTemplate() {{{2
 function! inline_edit#AngularCssTemplate()
   call inline_edit#PushCursor()
+  let cursor_line = line('.')
 
   try
     let [component_start, _] = s:CheckInsideAngularComponent()
@@ -306,8 +308,8 @@ function! inline_edit#AngularCssTemplate()
     let start = line('.')
     let end = search('`\(,\|$\)', 'Wc', array_end)
 
-    if end == 0
-      " No end quote was found
+    if end == 0 || end < cursor_line
+      " No end quote was found or end quote was above cursor
       return []
     endif
 
