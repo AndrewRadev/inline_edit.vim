@@ -248,6 +248,183 @@ function! inline_edit#PythonMultilineString()
   return [start, end, filetype, indent]
 endfunction
 
+" function! inline_edit#AngularHtmlTemplate() {{{2
+function! inline_edit#AngularHtmlTemplate()
+  call inline_edit#PushCursor()
+  let cursor_line = line('.')
+
+  try
+    let [component_start, component_end] = s:CheckInsideAngularComponent()
+    if component_start < 0
+      return []
+    endif
+
+    let start_backtick = search('^\s*template:\s*`\s*$', 'bWe')
+    if start_backtick == 0
+      return []
+    endif
+
+    normal! j0
+    let start = line('.')
+    let end = search('^\s*`\(,\|$\)', 'W')
+
+    if end == 0 || end < cursor_line
+      " No end quote was found or end quote was above cursor
+      return []
+    endif
+
+    let end -= 1
+  finally
+    call inline_edit#PopCursor()
+  endtry
+
+  let indent = s:GetCommonIndent(start, end)
+
+  return [start, end, 'html', indent]
+endfunction
+
+" function! inline_edit#AngularCssTemplate() {{{2
+function! inline_edit#AngularCssTemplate()
+  call inline_edit#PushCursor()
+  let cursor_line = line('.')
+
+  try
+    let [component_start, _] = s:CheckInsideAngularComponent()
+    if component_start < 0
+      return []
+    endif
+
+    let [array_start, array_end] = s:CheckInsideStylesArray()
+    if array_start < 0
+      return []
+    endif
+
+    let start_backtick = search('`', 'bWec', array_start)
+    if start_backtick == 0
+      return []
+    endif
+
+    normal! j0
+    let start = line('.')
+    let end = search('`\(,\|$\)', 'Wc', array_end)
+
+    if end == 0 || end < cursor_line
+      " No end quote was found or end quote was above cursor
+      return []
+    endif
+
+    let end -= 1
+
+    if end - start <= 0
+      " no multiline content
+      return []
+    endif
+  finally
+    call inline_edit#PopCursor()
+  endtry
+
+  let indent = s:GetCommonIndent(start, end)
+
+  return [start, end, 'css', indent]
+endfunction
+
 function s:CheckInsidePythonString()
   return index(map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")'), "pythonString") >= 0
+endfunction
+
+function s:CheckInsideAngularComponent()
+  let current_pos = getpos('.')
+  let saved_view = winsaveview()
+
+  try
+    if search('^\s*@Component({', 'bWe') <= 0
+      return [-1, -1]
+    endif
+
+    let start_pos = getpos('.')
+
+    let skip_syntax = s:SkipSyntax(['typescriptString', 'typescriptTemplate', 'typescriptComment'])
+    if searchpair('{', '', '}', 'W', skip_syntax) <= 0
+      return [-1, -1]
+    endif
+
+    let end_pos = getpos('.')
+
+    if s:PosInside(current_pos, start_pos, end_pos)
+      return [start_pos[1], end_pos[1]]
+    else
+      return [-1, -1]
+    endif
+  finally
+    call winrestview(saved_view)
+  endtry
+endfunction
+
+function s:CheckInsideStylesArray()
+  let current_pos = getpos('.')
+  let saved_view = winsaveview()
+
+  try
+    if search('^\s*styles:\s*[', 'bWe') <= 0
+      return [-1, -1]
+    endif
+
+    let start_pos = getpos('.')
+
+    let skip_syntax = s:SkipSyntax(['typescriptString', 'typescriptTemplate', 'typescriptComment'])
+    if searchpair('\[', '', '\]', 'W', skip_syntax) <= 0
+      return [-1, -1]
+    endif
+
+    let end_pos = getpos('.')
+
+    if s:PosInside(current_pos, start_pos, end_pos)
+      return [start_pos[1], end_pos[1]]
+    else
+      return [-1, -1]
+    endif
+  finally
+    call winrestview(saved_view)
+  endtry
+endfunction
+
+function s:GetCommonIndent(start, end)
+  let indent = indent(a:start)
+
+  for i in range(a:start + 1, a:end)
+    let current_indent = indent(i)
+
+    " Get the minimum indent of the non-blank lines
+    if current_indent < indent && getline(i) !~? '^\s*$'
+      let indent = current_indent
+    endif
+  endfor
+
+  return indent
+endfunction
+
+function s:SkipSyntax(syntax_groups)
+  let skip_pattern  = '\%('.join(a:syntax_groups, '\|').'\)'
+  return "synIDattr(synID(line('.'),col('.'),1),'name') =~# '".skip_pattern."'"
+endfunction
+
+function! s:PosInside(current, start, end) abort
+  let [_, current_line, current_col, _] = a:current
+  let [_, start_line, start_col, _]     = a:start
+  let [_, end_line, end_col, _]         = a:end
+
+  " If the start and end are the same, we don't have anything to edit
+  if start_line == end_line
+    return 0
+  endif
+
+  if current_line > start_line && current_line < end_line
+    return 1
+  elseif current_line == start_line && current_line <= end_line && current_col > start_col
+    return 1
+  elseif current_line == end_line && current_line >= start_line && current_col < end_col
+    return 1
+  else
+    return 0
+  endif
 endfunction

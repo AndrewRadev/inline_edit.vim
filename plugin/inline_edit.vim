@@ -131,8 +131,13 @@ call add(g:inline_edit_patterns, {
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'typescript',
       \ 'sub_filetype':  'html',
-      \ 'start':         '^\s*template:\s*`',
-      \ 'end':           '`\(,\|$\)'
+      \ 'callback':      'inline_edit#AngularHtmlTemplate'
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'typescript',
+      \ 'sub_filetype':  'css',
+      \ 'callback':      'inline_edit#AngularCssTemplate'
       \ })
 
 command! -range=0 -nargs=* -complete=filetype
