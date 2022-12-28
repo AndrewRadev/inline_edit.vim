@@ -157,4 +157,22 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
   </style>
   ```
 
+- Angular components' CSS and templates (Thanks to [@MartinAskestad](https://github.com/MartinAskestad))
+
+``` typescript
+@Component({
+  selector: 'my-component',
+  template: `
+    <p class="my-p">My component works!</p>
+  `,
+  styles: [
+    `
+      .my-p {
+        color: orange;
+      }
+    `,
+  ],
+})
+```
+
 - Visual mode - any area that you mark
