@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Editing" do
   let(:filename) { 'test.html' }
 
-  specify "Visual selection" do
+  specify "javascript in HTML" do
     set_file_contents <<~HTML
       <script>
         alert("Foo");

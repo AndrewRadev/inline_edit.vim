@@ -89,7 +89,6 @@ Javascript and CSS within HTML ~
     </style>
   </head>
 <
-
 SQL within ruby (matches "<<~SQL") ~
 >
     def some_heavy_query
@@ -98,7 +97,6 @@ SQL within ruby (matches "<<~SQL") ~
       SQL
     end
 <
-
 Code within markdown blocks ~
 >
     Some text.
@@ -111,7 +109,6 @@ Code within markdown blocks ~
 
     Some other text.
 <
-
 Blocks in django templates ~
 >
     <body>
@@ -135,6 +132,36 @@ Javascript and CSS within HAML ~
       :css
         .content { border: 1px solid black; }
 
+Vue templates ~
+>
+    <template>
+      <p>{{ greeting }} World!</p>
+    </template>
+<
+Heredocs in shellscript, ruby, or perl (matches "<<-LANG") ~
+>
+    cat <<-RUBY
+      #! /usr/bin/env ruby
+
+      puts "OK"
+    RUBY
+<
+Angular components' CSS and templates ~
+>
+    @Component({
+      selector: 'my-component',
+      template: `
+        <p class="my-p">My component works!</p>
+      `,
+      styles: [
+        `
+          .my-p {
+            color: orange;
+          }
+        `,
+      ],
+    })
+<
 Visual Mode ~
 
 If you'd like to work on an area that's easily definable, |:InlineEdit| also

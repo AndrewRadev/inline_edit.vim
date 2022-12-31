@@ -52,4 +52,33 @@ describe "HTML" do
       }
     HTML
   end
+
+  describe "ERB" do
+    let(:filename) { 'test.erb' }
+
+    specify "javascript" do
+      set_file_contents <<~HTML
+        <head>
+          <title><%= @title %></title>
+          <script>
+            function Foo() {
+              console.log("bar");
+            }
+          </script>
+        </head>
+      HTML
+
+      vim.search 'script'
+      vim.command 'InlineEdit'
+
+      buffer_contents = get_buffer_contents
+
+      expect(vim.echo('&filetype')).to eq 'javascript'
+      expect(buffer_contents).to eq <<~HTML
+        function Foo() {
+          console.log("bar");
+        }
+      HTML
+    end
+  end
 end

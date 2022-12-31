@@ -108,7 +108,7 @@ function! inline_edit#controller#IndentEdit(pattern) dict
 
   call inline_edit#PopCursor()
 
-  if line('.') < start || line('.') > end
+  if line('.') < (start - 1) || line('.') > end
     " then we're not inside the section
     return 0
   endif
