@@ -21,6 +21,10 @@ end
 RSpec.configure do |config|
   config.include Support::Vim
 
+  config.before :each do
+    vim.command('only')
+  end
+
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end

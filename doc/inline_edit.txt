@@ -90,16 +90,16 @@ Javascript and CSS within HTML ~
   </head>
 <
 
-SQL within ruby (matches "<<-SQL") ~
+SQL within ruby (matches "<<~SQL") ~
 >
     def some_heavy_query
-      execute <<-SQL
+      execute <<~SQL
         SELECT * FROM users WHERE something = 'other';
       SQL
     end
 <
 
-Ruby code within markdown blocks ~
+Code within markdown blocks ~
 >
     Some text.
 

@@ -86,7 +86,7 @@ function! inline_edit#VimEmbeddedScript()
   endif
 
   let start     = line('.') + 1
-  let indent    = indent(line('.'))
+  let indent    = indent(start)
   let language  = substitute(getline('.'), start_pattern, '\1', '')
   let delimiter = substitute(getline('.'), start_pattern, '\2', '')
 

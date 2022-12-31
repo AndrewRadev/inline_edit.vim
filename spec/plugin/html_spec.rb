@@ -20,6 +20,7 @@ describe "HTML" do
 
     buffer_contents = get_buffer_contents
 
+    expect(vim.echo('&filetype')).to eq 'javascript'
     expect(buffer_contents).to eq <<~HTML
       function Foo() {
         console.log("bar");
@@ -44,6 +45,7 @@ describe "HTML" do
 
     buffer_contents = get_buffer_contents
 
+    expect(vim.echo('&filetype')).to eq 'css'
     expect(buffer_contents).to eq <<~HTML
       div {
         background-color: red;

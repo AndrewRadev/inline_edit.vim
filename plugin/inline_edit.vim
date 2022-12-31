@@ -59,7 +59,7 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'ruby',
       \ 'sub_filetype':      'sql',
       \ 'indent_adjustment': 1,
-      \ 'start':             '<<-\?SQL',
+      \ 'start':             '<<[-~]\?SQL',
       \ 'end':               '^\s*SQL',
       \ })
 

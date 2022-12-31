@@ -17,6 +17,7 @@ describe "Ruby" do
 
     buffer_contents = get_buffer_contents
 
+    expect(vim.echo('&filetype')).to eq 'sql'
     expect(buffer_contents).to eq <<~HTML
       SELECT * FROM users WHERE something = 'other';
     HTML
