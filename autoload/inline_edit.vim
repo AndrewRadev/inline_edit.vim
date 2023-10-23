@@ -48,7 +48,7 @@ endfunction
 " Opens up a new proxy buffer with the contents of a fenced code block in
 " github-flavoured markdown.
 function! inline_edit#MarkdownFencedCode()
-  let start_pattern = '^\s*```\s*\(.\+\)'
+  let start_pattern = '^\s*```\s*\(\k\+\)'
   let end_pattern   = '^\s*```\s*$'
 
   call inline_edit#PushCursor()
@@ -60,6 +60,7 @@ function! inline_edit#MarkdownFencedCode()
   endif
   let start    = line('.') + 1
   let filetype = matchlist(getline('.'), start_pattern, 0)[1]
+  let filetype = tolower(filetype)
 
   " find end of area
   if searchpair(start_pattern, '', end_pattern, 'W') <= 0
