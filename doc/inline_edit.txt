@@ -162,6 +162,14 @@ Angular components' CSS and templates ~
       ],
     })
 <
+Snakemake shell scripts ~
+>
+    shell: """
+        cp -v {input.db} {output.db}
+        cp -v {input.fastq_n} {output.fastq_n}
+        cp -v {input.fastq_t} {output.fastq_t}
+    """
+<
 Visual Mode ~
 
 If you'd like to work on an area that's easily definable, |:InlineEdit| also

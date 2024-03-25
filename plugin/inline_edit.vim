@@ -140,6 +140,14 @@ call add(g:inline_edit_patterns, {
       \ 'callback':      'inline_edit#AngularCssTemplate'
       \ })
 
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'snakemake',
+      \ 'sub_filetype':      'bash',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '^\s*shell:\s*\%("""\|''''''\)$',
+      \ 'end':               '^\s*\%("""\|''''''\)$',
+      \ })
+
 command! -range=0 -nargs=* -complete=filetype
       \ InlineEdit call s:InlineEdit(<count>, <q-args>)
 
