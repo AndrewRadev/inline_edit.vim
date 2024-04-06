@@ -43,6 +43,10 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
       \ 'callback':      'inline_edit#MarkdownFencedCode',
       \ })
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'rmd',
+      \ 'callback':      'inline_edit#MarkdownFencedCode',
+      \ })
 
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'vim',
@@ -53,7 +57,6 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'python',
       \ 'callback':      'inline_edit#PythonMultilineString'
       \ })
-
 
 call add(g:inline_edit_patterns, {
       \ 'main_filetype':     'ruby',

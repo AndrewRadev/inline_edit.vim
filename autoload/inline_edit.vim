@@ -48,7 +48,8 @@ endfunction
 " Opens up a new proxy buffer with the contents of a fenced code block in
 " github-flavoured markdown.
 function! inline_edit#MarkdownFencedCode()
-  let start_pattern = '^\s*```\s*\(\k\+\)'
+  " Note: Optional `{` to handle Rmarkdown
+  let start_pattern = '^\s*```\s*{\=\(\k\+\)'
   let end_pattern   = '^\s*```\s*$'
 
   call inline_edit#PushCursor()
