@@ -1,3 +1,5 @@
+let s:type_list = type([])
+
 function! inline_edit#controller#New()
   let controller = {
         \ 'proxies': [],
@@ -12,8 +14,22 @@ function! inline_edit#controller#New()
   return controller
 endfunction
 
-function! inline_edit#controller#NewProxy(start_line, end_line, filetype, indent) dict
-  let proxy = inline_edit#proxy#New(self, a:start_line, a:end_line, a:filetype, a:indent)
+function! inline_edit#controller#NewProxy(start, end, filetype, indent) dict
+  if type(a:start) == s:type_list
+    let [start_line, start_col] = a:start
+  else
+    let start_line = a:start
+    let start_col = 0
+  endif
+
+  if type(a:end) == s:type_list
+    let [end_line, end_col] = a:end
+  else
+    let end_line = a:end
+    let end_col = 0
+  endif
+
+  let proxy = inline_edit#proxy#New(self, start_line, end_line, start_col, end_col, a:filetype, a:indent)
   call add(self.proxies, proxy)
 
   return proxy
@@ -75,11 +91,33 @@ function! inline_edit#controller#PatternEdit(pattern) dict
     call inline_edit#PopCursor()
     return 0
   endif
-  let end    = line('.') - 1
-  let indent = indent(line('.')) + pattern.indent_adjustment * (&et ? &sw : &ts)
+  let end = line('.') - 1
+
+  if get(pattern, 'include_margins', 0)
+    " Take the indent from the second line, if there is one
+    if end - start >= 0
+      let indent = indent(start + 1)
+    else
+      let indent = 0
+    endif
+
+    let [_m, _ms, match_end] = matchstrpos(getline(start - 1), pattern.start .. '\s*\S')
+    if match_end > 0
+      " pass a line and column
+      let start = [start - 1, match_end]
+    endif
+
+    let [_m, match_start, _me] = matchstrpos(getline(end + 1), pattern.end)
+    if match_start > 0
+      " pass a line and column
+      let end = [end + 1, match_start + 1]
+    endif
+  else
+    " Take the indent of the current (end) line as the baseline
+    let indent = indent(line('.')) + pattern.indent_adjustment * (&et ? &sw : &ts)
+  endif
 
   call inline_edit#PopCursor()
-
   call self.NewProxy(start, end, pattern.sub_filetype, indent)
   return 1
 endfunction

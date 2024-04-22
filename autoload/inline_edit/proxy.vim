@@ -1,18 +1,20 @@
-function! inline_edit#proxy#New(controller, start_line, end_line, filetype, indent)
+function! inline_edit#proxy#New(controller, start_line, end_line, start_col, end_col, filetype, indent) abort
   let proxy = {
         \ 'controller':      a:controller,
         \ 'original_buffer': expand('%:p'),
         \ 'proxy_buffer':    -1,
         \ 'filetype':        a:filetype,
-        \ 'start':           a:start_line,
-        \ 'end':             a:end_line,
+        \ 'start_line':      a:start_line,
+        \ 'end_line':        a:end_line,
+        \ 'start_prefix':    (a:start_col > 0 ? strpart(getline(a:start_line), 0, a:start_col - 1) : ''),
+        \ 'end_suffix':      (a:end_col   > 0 ? strpart(getline(a:end_line), a:end_col - 1) : ''),
         \ 'indent':          (&et ? a:indent : a:indent / &ts),
         \
         \ 'UpdateOriginalBuffer': function('inline_edit#proxy#UpdateOriginalBuffer')
         \ }
 
   let existing_content = join(getbufline(proxy.original_buffer, a:start_line, a:end_line), ' ')
-  if existing_content =~ '\S'
+  if existing_content =~ '\S' && proxy.start_prefix == ''
     " then there's already some code, use its indent, if it's smaller
     let common_indent = s:GetCommonIndent(a:start_line, a:end_line)
     let proxy.indent = min([proxy.indent, common_indent])
@@ -55,6 +57,14 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
     call add(new_lines, line)
   endfor
 
+  if self.start_prefix != ''
+    let new_lines[0] = self.start_prefix .. strpart(new_lines[0], len(leading_whitespace))
+  endif
+
+  if self.end_suffix != ''
+    let new_lines[-1] ..= self.end_suffix
+  endif
+
   call inline_edit#PushCursor() " in proxy buffer
 
   " Switch to the original buffer, delete the relevant lines, add the new
@@ -71,11 +81,11 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
   exe 'buffer ' . original_bufnr
 
   call inline_edit#PushCursor()
-  call cursor(self.start, 1)
-  if self.end - self.start >= 0
-    exe self.start . ',' . self.end . 'delete _'
+  call cursor(self.start_line, 1)
+  if self.end_line - self.start_line >= 0
+    exe self.start_line . ',' . self.end_line . 'delete _'
   endif
-  call append(self.start - 1, new_lines)
+  call append(self.start_line - 1, new_lines)
   if g:inline_edit_autowrite
     write
   endif
@@ -86,10 +96,10 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   " Keep the difference in lines to know how to update the other proxies if
   " necessary.
-  let line_count     = self.end - self.start + 1
+  let line_count     = self.end_line - self.start_line + 1
   let new_line_count = len(new_lines)
 
-  let self.end = self.start + new_line_count - 1
+  let self.end_line = self.start_line + new_line_count - 1
   call s:UpdateProxyBuffer(self)
 
   call inline_edit#PopCursor() " in proxy buffer
@@ -100,13 +110,30 @@ endfunction
 " Called once upon setup. Returns the lines from the original buffer and the
 " position of the cursor in that buffer.
 function! s:LoadOriginalBufferContents(proxy)
-  let proxy    = a:proxy
-  let position = getpos('.')
-  let lines    = []
+  let proxy          = a:proxy
+  let position       = getpos('.')
+  let lines          = []
+  let indent_pattern = '^\s\{'.proxy.indent.'}'
 
-  for line in getbufline(proxy.original_buffer, proxy.start, proxy.end)
-    call add(lines, substitute(line, '^\s\{'.proxy.indent.'}', '', ''))
+  if proxy.start_prefix == ''
+    let start_line = proxy.start_line
+  else
+    call add(lines, strpart(getline(proxy.start_line), len(proxy.start_prefix)))
+    let start_line = proxy.start_line + 1
+  endif
+  let end_line = proxy.end_line - 1
+
+  for line in getbufline(proxy.original_buffer, start_line, end_line)
+    call add(lines, substitute(line, indent_pattern, '', ''))
   endfor
+
+  if proxy.end_suffix == ''
+    call add(lines, substitute(getline(proxy.end_line), indent_pattern, '', ''))
+  else
+    let last_line = getline(proxy.end_line)
+    let last_line = strpart(last_line, 0, len(last_line) - len(proxy.end_suffix))
+    call add(lines, substitute(last_line, indent_pattern, '', ''))
+  endif
 
   return [lines, position]
 endfunction
@@ -150,8 +177,8 @@ function! s:UpdateProxyBuffer(proxy)
 
   let a:proxy.description = printf('[%s:%d-%d]',
         \ fnamemodify(a:proxy.original_buffer, ':~:.'),
-        \ a:proxy.start,
-        \ a:proxy.end)
+        \ a:proxy.start_line,
+        \ a:proxy.end_line)
 
   if g:inline_edit_proxy_type == 'scratch'
     silent exec 'keepalt file ' . fnameescape(a:proxy.description)
@@ -192,7 +219,7 @@ function! s:PositionCursor(proxy, position)
   let proxy       = a:proxy
   let position    = a:position
   let position[0] = bufnr(proxy.proxy_buffer)
-  let position[1] = position[1] - proxy.start + 1
+  let position[1] = position[1] - proxy.start_line + 1
 
   call setpos('.', position)
 endfunction
