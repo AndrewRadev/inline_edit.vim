@@ -94,7 +94,8 @@ function! inline_edit#controller#PatternEdit(pattern) dict
   let end = line('.') - 1
 
   if get(pattern, 'include_margins', 0)
-    " Take the indent from the second line, if there is one
+    " Take the indent from the second line, if there is one, otherwise we have
+    " a fully inline pattern, so indent isn't going to matter
     if end - start >= 0
       let indent = indent(start + 1)
     else
@@ -103,9 +104,9 @@ function! inline_edit#controller#PatternEdit(pattern) dict
 
     let end_col_start = 0
 
+    " If start pattern has any non-whitespace afterwards, take its column:
     let [_m, _ms, match_end] = matchstrpos(getline(start - 1), pattern.start .. '\s*\S')
     if match_end > 0
-      " pass a line and column
       let start = [start - 1, match_end]
 
       if start[0] == end + 1
@@ -115,9 +116,9 @@ function! inline_edit#controller#PatternEdit(pattern) dict
       endif
     endif
 
-    let [_m, match_start, _me] = matchstrpos(getline(end + 1), '\S\zs'.pattern.end, end_col_start)
+    " If end pattern is preceded by any non-whitespace, take its column:
+    let [_m, match_start, _me] = matchstrpos(getline(end + 1), '\S\s*\zs'.pattern.end, end_col_start)
     if match_start > 0
-      " pass a line and column
       let end = [end + 1, match_start + 1]
     endif
   else
