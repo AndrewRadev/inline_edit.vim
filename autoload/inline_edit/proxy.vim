@@ -82,10 +82,23 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
 
   call inline_edit#PushCursor()
   call cursor(self.start_line, 1)
+
+  if self.start_line == 1 && self.end_line == line('$')
+    let deleting_entire_file = 1
+  else
+    let deleting_entire_file = 0
+  endif
+
   if self.end_line - self.start_line >= 0
     exe self.start_line . ',' . self.end_line . 'delete _'
   endif
   call append(self.start_line - 1, new_lines)
+
+  if deleting_entire_file
+    " After appending, we'll have one extra line
+    $delete _
+  endif
+
   if g:inline_edit_autowrite
     write
   endif
