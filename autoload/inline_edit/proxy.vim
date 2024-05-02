@@ -129,6 +129,8 @@ function! s:LoadOriginalBufferContents(proxy)
 
   if proxy.end_suffix == ''
     call add(lines, substitute(getline(proxy.end_line), indent_pattern, '', ''))
+  elseif proxy.start_line == proxy.end_line
+    let lines[0] = strpart(lines[0], 0, len(lines[0]) - len(proxy.end_suffix))
   else
     let last_line = getline(proxy.end_line)
     let last_line = strpart(last_line, 0, len(last_line) - len(proxy.end_suffix))

@@ -101,13 +101,21 @@ function! inline_edit#controller#PatternEdit(pattern) dict
       let indent = 0
     endif
 
+    let end_col_start = 0
+
     let [_m, _ms, match_end] = matchstrpos(getline(start - 1), pattern.start .. '\s*\S')
     if match_end > 0
       " pass a line and column
       let start = [start - 1, match_end]
+
+      if start[0] == end + 1
+        " then the start line is the same as the end line, so we should start
+        " searching for the end pattern after the end of this match
+        let end_col_start = match_end
+      endif
     endif
 
-    let [_m, match_start, _me] = matchstrpos(getline(end + 1), pattern.end)
+    let [_m, match_start, _me] = matchstrpos(getline(end + 1), pattern.end, end_col_start)
     if match_start > 0
       " pass a line and column
       let end = [end + 1, match_start + 1]
