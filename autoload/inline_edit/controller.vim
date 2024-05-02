@@ -115,7 +115,7 @@ function! inline_edit#controller#PatternEdit(pattern) dict
       endif
     endif
 
-    let [_m, match_start, _me] = matchstrpos(getline(end + 1), pattern.end, end_col_start)
+    let [_m, match_start, _me] = matchstrpos(getline(end + 1), '\S\zs'.pattern.end, end_col_start)
     if match_start > 0
       " pass a line and column
       let end = [end + 1, match_start + 1]
