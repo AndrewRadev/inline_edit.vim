@@ -51,9 +51,9 @@ function! inline_edit#controller#SyncProxies(changed_proxy, delta) dict
       continue
     endif
 
-    if a:changed_proxy.end <= proxy.start
-      let proxy.start += a:delta
-      let proxy.end   += a:delta
+    if a:changed_proxy.end_line <= proxy.start_line
+      let proxy.start_line += a:delta
+      let proxy.end_line   += a:delta
     endif
   endfor
 endfunction
