@@ -335,11 +335,18 @@ the margins of the area to edit. The other entries are as follows:
 
     - indent_adjustment:
 
-      Setting it to "1" will indent the proxy buffer's contents 1 indentation
-      level more than the surrounding patterns. If it's "2", it will be two
+      Setting it to 1 will indent the proxy buffer's contents 1 indentation
+      level more than the surrounding patterns. If it's 2, it will be two
       levels, and so on. The default is 0, which means that the contents of
       the proxy buffer will be indented with the level of the delimiting
       patterns (the end pattern, to be precise).
+
+    - include_margins:
+
+      Setting it to 1 will take any content after the starting delimiter and
+      before the ending delimiter on their same lines. So, if the delimiters
+      are not line-based, but they include part of the line before/after the
+      delimiter, this setting will open that extra content at the margins.
 
 With a "start" pattern in an indent-based filetype ~
 >
