@@ -170,6 +170,13 @@ Snakemake shell scripts ~
         cp -v {input.fastq_t} {output.fastq_t}
     """
 <
+Scala SQL strings ~
+>
+    something = sql"""SELECT id, foo, bar baz
+                      FROM schema.table
+                      WHERE id = $id"""
+                  .queryBy(row => ...)
+<
 Visual Mode ~
 
 If you'd like to work on an area that's easily definable, |:InlineEdit| also

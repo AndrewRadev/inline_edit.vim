@@ -151,13 +151,13 @@ call add(g:inline_edit_patterns, {
       \ 'end':               '^\s*\%("""\|''''''\)$',
       \ })
 
-call add(g:inline_edit_patterns, #{
-      \ main_filetype:     "scala",
-      \ sub_filetype:      "sql",
-      \ indent_adjustment: 1,
-      \ include_margins:   1,
-      \ start:             '\(sql\|SQL\)"""',
-      \ end:               '"""',
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'scala',
+      \ 'sub_filetype':      'sql',
+      \ 'indent_adjustment': 1,
+      \ 'include_margins':   1,
+      \ 'start':             '\(sql\|SQL\)"""',
+      \ 'end':               '"""',
       \ })
 
 command! -range=0 -nargs=* -complete=filetype
