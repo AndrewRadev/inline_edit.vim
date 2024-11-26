@@ -172,7 +172,7 @@ function! s:CreateProxyBuffer(proxy, lines)
     $delete _
     set nomodified
   elseif g:inline_edit_proxy_type == 'tempfile'
-    exe 'silent noswapfile split ' . tempname()
+    exe 'silent noswapfile ' . g:inline_edit_new_buffer_command . ' ' . tempname()
     call append(0, lines)
     $delete _
     write
