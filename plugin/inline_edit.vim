@@ -43,6 +43,7 @@ call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
       \ 'callback':      'inline_edit#MarkdownFencedCode',
       \ })
+
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'rmd',
       \ 'callback':      'inline_edit#MarkdownFencedCode',
@@ -194,11 +195,16 @@ function! s:InlineEdit(count, filetype)
 
         if !empty(result)
           call call(controller.NewProxy, result, controller)
+
+          if a:filetype != ''
+            let &filetype = a:filetype
+          endif
+
           return
         endif
-      elseif get(entry, 'indent_based', 0) && controller.IndentEdit(entry)
+      elseif get(entry, 'indent_based', 0) && controller.IndentEdit(entry, a:filetype)
         return
-      elseif !get(entry, 'indent_based', 0) && controller.PatternEdit(entry)
+      elseif !get(entry, 'indent_based', 0) && controller.PatternEdit(entry, a:filetype)
         return
       endif
     endfor

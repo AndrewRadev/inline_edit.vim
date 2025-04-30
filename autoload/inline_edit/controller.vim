@@ -71,11 +71,15 @@ function! inline_edit#controller#VisualEdit(filetype) dict
   call self.NewProxy(start, end, filetype, indent)
 endfunction
 
-function! inline_edit#controller#PatternEdit(pattern) dict
+function! inline_edit#controller#PatternEdit(pattern, filetype_override) dict
   let pattern = extend({
         \ 'sub_filetype':      &filetype,
         \ 'indent_adjustment': 0,
         \ }, a:pattern)
+
+  if a:filetype_override != ''
+    let pattern.sub_filetype = a:filetype_override
+  endif
 
   call inline_edit#PushCursor()
 
@@ -131,11 +135,15 @@ function! inline_edit#controller#PatternEdit(pattern) dict
   return 1
 endfunction
 
-function! inline_edit#controller#IndentEdit(pattern) dict
+function! inline_edit#controller#IndentEdit(pattern, filetype_override) dict
   let pattern = extend({
         \ 'sub_filetype':      &filetype,
         \ 'indent_adjustment': 0,
         \ }, a:pattern)
+
+  if a:filetype_override != ''
+    let pattern.sub_filetype = a:filetype_override
+  endif
 
   call inline_edit#PushCursor()
 

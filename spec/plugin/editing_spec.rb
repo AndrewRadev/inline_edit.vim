@@ -16,6 +16,9 @@ describe "Editing" do
     buffer_contents = get_buffer_contents
     expect(buffer_contents.strip).to eq 'alert("Foo");'
 
+    filetype = vim.echo('&filetype')
+    expect(filetype).to eq 'javascript'
+
     vim.search 'Foo'
     vim.normal 'cwBar'
     vim.write
@@ -27,5 +30,19 @@ describe "Editing" do
         alert("Bar");
       </script>
     EOF
+  end
+
+  specify "explicit filetype override" do
+    set_file_contents <<~HTML
+      <script>
+        alert("Foo");
+      </script>
+    HTML
+
+    vim.search 'script'
+    vim.command 'InlineEdit typescript'
+
+    filetype = vim.echo('&filetype')
+    expect(filetype).to eq 'typescript'
   end
 end

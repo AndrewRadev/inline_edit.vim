@@ -44,4 +44,19 @@ describe "HTML" do
       .content { border: 1px solid black; }
     HTML
   end
+
+  specify "explicit filetype" do
+    set_file_contents <<~HTML
+      %body
+        :javascript
+          alert("OK");
+    HTML
+
+    vim.search 'alert'
+    vim.command 'InlineEdit typescript'
+
+    buffer_contents = get_buffer_contents
+
+    expect(vim.echo('&filetype')).to eq 'typescript'
+  end
 end

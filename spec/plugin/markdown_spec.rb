@@ -54,4 +54,30 @@ describe "Markdown" do
       }
     HTML
   end
+
+  specify "unknown code block with explicit filetype" do
+    set_file_contents <<~HTML
+      Some text.
+
+      ```
+      fn foo() {
+        println!("OK");
+      }
+      ```
+
+      Some other text.
+    HTML
+
+    vim.search 'fn foo'
+    vim.command 'InlineEdit rust'
+
+    buffer_contents = get_buffer_contents
+
+    expect(vim.echo('&filetype')).to eq 'rust'
+    expect(buffer_contents).to eq <<~HTML
+      fn foo() {
+        println!("OK");
+      }
+    HTML
+  end
 end
