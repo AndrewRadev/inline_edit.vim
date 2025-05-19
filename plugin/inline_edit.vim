@@ -38,6 +38,9 @@ if !exists('g:inline_edit_modify_statusline')
   let g:inline_edit_modify_statusline = 1
 endif
 
+" Built in HTML-like filetypes, maps to the special "*html" pseudo-filetype
+let s:html_like_filetypes = ['html', 'eruby', 'php', 'eco', 'vue']
+
 " Default patterns
 call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'markdown',
@@ -195,7 +198,7 @@ function! s:InlineEdit(count, filetype)
       if has_key(entry, 'main_filetype')
         if entry.main_filetype == '*html'
           " treat "*html" as a special case
-          let filetypes = ['html', 'eruby', 'php', 'eco', 'vue'] + g:inline_edit_html_like_filetypes
+          let filetypes = s:html_like_filetypes + g:inline_edit_html_like_filetypes
           let pattern_filetype = join(filetypes, '\|')
         else
           let pattern_filetype = entry.main_filetype
