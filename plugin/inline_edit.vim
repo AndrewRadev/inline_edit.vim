@@ -161,6 +161,22 @@ call add(g:inline_edit_patterns, {
       \ 'end':               '"""',
       \ })
 
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'templ',
+      \ 'sub_filetype':      'javascript',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<script\>[^>]*>',
+      \ 'end':               '</script>',
+      \ })
+
+call add(g:inline_edit_patterns, {
+      \ 'main_filetype':     'templ',
+      \ 'sub_filetype':      'typescript',
+      \ 'indent_adjustment': 1,
+      \ 'start':             '<script[^>]*lang=["'']ts["''][^>]*>',
+      \ 'end':               '</script>',
+      \ })
+
 command! -range=0 -nargs=* -complete=filetype
       \ InlineEdit call s:InlineEdit(<count>, <q-args>)
 
