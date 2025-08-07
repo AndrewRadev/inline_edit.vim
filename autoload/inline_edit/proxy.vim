@@ -184,6 +184,7 @@ function! s:CreateProxyBuffer(proxy, lines)
     $delete _
     write
   elseif g:inline_edit_proxy_type == 'vscode'
+    Vsplit
     let script =<< EOF
       async function createFileIfNotExists(filePath) {
           const content = args.lines.join('\n');
