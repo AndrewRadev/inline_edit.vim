@@ -31,6 +31,10 @@ function! inline_edit#proxy#New(controller, start_line, end_line, start_col, end
     autocmd BufWriteCmd <buffer> silent call b:inline_edit_proxy.UpdateOriginalBuffer()
   elseif g:inline_edit_proxy_type == 'tempfile'
     autocmd BufWritePost <buffer> silent call b:inline_edit_proxy.UpdateOriginalBuffer()
+  elseif g:inline_edit_proxy_type == 'vscode'
+    " vscode-neovim currently doesn't support BufWritePost
+    " Hacky workaround is to use a map
+    nnoremap <buffer> :w<cr> :<c-u>update \| call b:inline_edit_proxy.UpdateOriginalBuffer()<cr>
   endif
 
   return proxy
@@ -79,6 +83,9 @@ function! inline_edit#proxy#UpdateOriginalBuffer() dict
     return
   endif
   exe 'buffer ' . original_bufnr
+  if g:inline_edit_proxy_type == 'vscode'
+    call v:lua.require('vscode').call("_wait", {'args': [100]})
+  endif
 
   call inline_edit#PushCursor()
   call cursor(self.start_line, 1)
@@ -176,6 +183,23 @@ function! s:CreateProxyBuffer(proxy, lines)
     call append(0, lines)
     $delete _
     write
+  elseif g:inline_edit_proxy_type == 'vscode'
+    let script =<< EOF
+      async function createFileIfNotExists(filePath) {
+          const content = args.lines.join('\n');
+          const encodedContent = new TextEncoder().encode(content);
+          await vscode.workspace.fs.writeFile(fileUri, encodedContent);
+          await vscode.commands.executeCommand("vscode.open", fileUri)
+          await vscode.commands.executeCommand("workbench.action.files.save")
+      }
+
+      var root = vscode.workspace.workspaceFolders[0].uri
+      var tempLocation = "/tmp/inline_edit_" + crypto.randomUUID()
+      var fileUri = root.with({path: tempLocation})
+
+      await createFileIfNotExists(fileUri)
+EOF
+    call v:lua.require('vscode').eval(join(script, "\n"), {'args': {'lines': lines}})
   endif
 
   let &readonly = saved_readonly
@@ -212,7 +236,20 @@ function! s:UpdateProxyBuffer(proxy)
     let a:proxy.filetype = &filetype
   endif
 
-  let &filetype = a:proxy.filetype
+
+  if g:inline_edit_proxy_type == 'vscode'
+    call v:lua.require('vscode').call("_wait", {'args': [100]})
+    let script =<< EOF
+      const activeEditor = vscode.window.activeTextEditor;
+      console.log(activeEditor)
+      if (activeEditor) {
+          await vscode.languages.setTextDocumentLanguage(activeEditor.document, args.filetype)
+      }
+EOF
+    call v:lua.require('vscode').eval(join(script, "\n"), {'args': {'filetype': a:proxy.filetype}})
+  else
+    let &filetype = a:proxy.filetype
+  endif
 endfunction
 
 " Called once upon setup. Manipulates the statusline to show information for

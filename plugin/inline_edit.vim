@@ -26,8 +26,8 @@ if !exists('g:inline_edit_proxy_type')
   let g:inline_edit_proxy_type = 'scratch'
 endif
 
-if index(['scratch', 'tempfile'], g:inline_edit_proxy_type) < 0
-  echoerr 'Inline Edit: Proxy type can''t be "'.g:inline_edit_proxy_type.'". Needs to be one of: scratch, tempfile'
+if index(['scratch', 'tempfile', 'vscode'], g:inline_edit_proxy_type) < 0
+  echoerr 'Inline Edit: Proxy type can''t be "'.g:inline_edit_proxy_type.'". Needs to be one of: scratch, tempfile, vscode'
 endif
 
 if !exists('g:inline_edit_new_buffer_command')
