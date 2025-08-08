@@ -176,3 +176,7 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
 ```
 
 - Visual mode - any area that you mark
+
+## Extras
+
+To get the plugin working in vscode-neovim, you can try this fork that implements some vscode-specific features: <https://github.com/thalesmello/inline_edit.vim/tree/vscode>.
