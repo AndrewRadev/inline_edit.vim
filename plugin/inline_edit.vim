@@ -48,6 +48,11 @@ call add(g:inline_edit_patterns, {
       \ })
 
 call add(g:inline_edit_patterns, {
+      \ 'main_filetype': 'rst',
+      \ 'callback':      'inline_edit#RstCodeBlock',
+      \ })
+
+call add(g:inline_edit_patterns, {
       \ 'main_filetype': 'rmd',
       \ 'callback':      'inline_edit#MarkdownFencedCode',
       \ })

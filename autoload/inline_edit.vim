@@ -84,6 +84,42 @@ function! inline_edit#MarkdownFencedCode()
   return [start, end, filetype, indent]
 endfunction
 
+" function! inline_edit#RstCodeBlock() {{{2
+"
+" Opens up a new proxy buffer with the contents of a code block in
+" reStructuredText
+function! inline_edit#RstCodeBlock()
+  let start_pattern = '^\s*\.\. \%(code-block\|highlight\|sourcecode\|code\)::\s*\(\k\+\)\='
+
+  call inline_edit#PushCursor()
+
+  " find start of area
+  if search(start_pattern, 'Wb') <= 0
+    call inline_edit#PopCursor()
+    return []
+  endif
+
+  let start_line = nextnonblank(line('.') + 1)
+  while getline(start_line) =~ '^\s*:[[:keyword:]-]\+:'
+    let start_line = nextnonblank(start_line + 1)
+  endwhile
+
+  let filetype_match = matchlist(getline('.'), start_pattern, 0)
+
+  if len(filetype_match) > 0
+    let filetype = filetype_match[1]
+    let filetype = tolower(filetype)
+  endif
+
+  " find end of area
+  let end_line = inline_edit#util#LowerIndentLimit(start_line)
+  let indent = indent(end_line)
+
+  call inline_edit#PopCursor()
+
+  return [start_line, end_line, filetype, indent]
+endfunction
+
 " function! inline_edit#VimEmbeddedScript() {{{2
 "
 " Opens up a new proxy buffer with ruby, python, perl, lua or mzscheme code

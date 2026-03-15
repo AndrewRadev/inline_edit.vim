@@ -99,6 +99,20 @@ If you like the plugin, consider rating it on [vim.org](http://www.vim.org/scrip
     Some other text.
   </pre>
 
+- Code within reStructuredText code blocks
+  ``` rst
+  Some text.
+
+  .. code-block:: ruby
+      :linenos:
+
+      def foo
+        puts "OK"
+      end
+
+  Some other text.
+  ```
+
 - Django blocks in templates (Thanks to [@Vladimiroff](https://github.com/Vladimiroff))
 
   ``` htmldjango

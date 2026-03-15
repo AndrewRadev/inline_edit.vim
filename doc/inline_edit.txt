@@ -109,6 +109,19 @@ Code within markdown blocks ~
 
     Some other text.
 <
+Code within reStructuredText code blocks ~
+>
+    Some text.
+
+    .. code-block:: ruby
+        :linenos:
+
+        def foo
+          puts "OK"
+        end
+
+    Some other text.
+<
 Blocks in django templates ~
 >
     <body>

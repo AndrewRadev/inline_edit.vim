@@ -155,7 +155,7 @@ function! inline_edit#controller#IndentEdit(pattern, filetype_override) dict
   let start = line('.') + 1
 
   " find end of area
-  let end = s:LowerIndentLimit(start)
+  let end = inline_edit#util#LowerIndentLimit(start)
   if end - start < 0
     return 0
   endif
@@ -170,17 +170,4 @@ function! inline_edit#controller#IndentEdit(pattern, filetype_override) dict
 
   call self.NewProxy(start, end, pattern.sub_filetype, indent)
   return 1
-endfunction
-
-function! s:LowerIndentLimit(lineno)
-  let base_indent  = indent(a:lineno)
-  let current_line = a:lineno
-  let next_line    = nextnonblank(current_line + 1)
-
-  while current_line < line('$') && indent(next_line) >= base_indent
-    let current_line = next_line
-    let next_line    = nextnonblank(current_line + 1)
-  endwhile
-
-  return current_line
 endfunction
