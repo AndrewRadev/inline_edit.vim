@@ -197,4 +197,4 @@ To get the plugin working in vscode-neovim, you can try this fork that implement
 
 ## Contributing
 
-Pull requests are welcome, as long as they did not involve LLM usage. Take a look at [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Be sure to abide by the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) as well.
+Pull requests are welcome, as long as they **did not involve LLM usage**. Take a look at [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Be sure to abide by the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) as well.
